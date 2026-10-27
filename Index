@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>T&amp;E Command Center</title>
+<style>
+:root{
+  --brand:#0176D3;--brand-dk:#014486;--navy:#032D60;--sky:#1B96FF;--sky-lt:#EEF4FF;--sky-xl:#F7FAFF;
+  --bg:#F3F3F3;--card:#FFFFFF;--line:#E5E5E5;--line-2:#F3F3F3;--input:#C9C9C9;
+  --text:#181818;--text-2:#444444;--text-3:#747474;
+  --green:#2E844A;--green-lt:#EBF7E6;--amber:#A96404;--amber-bg:#FEF1E1;--orange:#DD7A01;--red:#BA0517;--red-lt:#FEDED8;
+  --purple:#7526E3;--purple-2:#9050E9;--purple-lt:#F2ECFD;--teal:#06A59A;
+  --ai:linear-gradient(135deg,#0176D3 0%,#7526E3 100%);
+  --font:'Salesforce Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  --shadow:0 2px 2px 0 rgba(0,0,0,.10);
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);font-size:13px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button,select,input,textarea{font-family:inherit;font-size:13px;color:var(--text)}
+:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.num,td.n{font-variant-numeric:tabular-nums}
+a{color:var(--brand)}
+
+/* global header */
+.gh{background:#fff;height:52px;display:flex;align-items:center;gap:14px;padding:0 20px;border-bottom:1px solid var(--line);position:relative;z-index:30}
+.logo{width:34px;height:34px;border-radius:8px;background:linear-gradient(140deg,#1B96FF,#0176D3 55%,#014486);display:grid;place-items:center;color:#fff;font-weight:800;font-size:12px;letter-spacing:-.02em;box-shadow:inset 0 -2px 0 rgba(0,0,0,.12)}
+.gh .app{font-weight:700;font-size:15px}
+.gh .app span{display:block;font-weight:400;font-size:11.5px;color:var(--text-3);line-height:1.1}
+.gh .sp{flex:1}
+.gh .who{font-size:12px;color:var(--text-2);text-align:right;line-height:1.35}
+.gh .who b{color:var(--text)}
+.ghbtn{height:32px;border:1px solid var(--input);background:#fff;border-radius:4px;padding:0 12px;cursor:pointer;font-weight:600;color:var(--brand)}
+.ghbtn:hover{background:var(--sky-xl)}
+.ghbtn.ai{border:0;color:#fff;background:var(--ai);display:inline-flex;align-items:center;gap:6px}
+.ghbtn.ai:hover{filter:brightness(1.08)}
+
+/* context band */
+.band{background:linear-gradient(100deg,#032D60 0%,#014486 45%,#0176D3 100%);color:#fff;padding:22px 24px 0;position:relative;overflow:hidden}
+.band::after{content:"";position:absolute;right:-80px;top:-120px;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,rgba(27,150,255,.35),rgba(27,150,255,0) 70%);pointer-events:none}
+.band .crumb{font-size:12px;color:#B8D7F5}
+.band h1{margin:2px 0 4px;font-size:24px;font-weight:700;letter-spacing:-.01em}
+.band .sub{font-size:13px;color:#D8E9FA;max-width:80ch}
+.tabs{display:flex;gap:2px;margin-top:18px;overflow-x:auto;position:relative;z-index:1}
+.tabs button{all:unset;cursor:pointer;padding:10px 14px 11px;color:#D8E9FA;font-weight:600;font-size:13px;border-radius:6px 6px 0 0;white-space:nowrap;display:flex;gap:6px;align-items:center}
+.tabs button:hover{color:#fff;background:rgba(255,255,255,.08)}
+.tabs button[aria-selected="true"]{background:var(--bg);color:var(--brand-dk)}
+.tabs button:focus-visible{outline:2px solid #fff;outline-offset:-2px}
+.tabs .badge{font-size:10.5px;padding:0 6px;border-radius:9px;background:rgba(255,255,255,.18);font-weight:700}
+.tabs button[aria-selected="true"] .badge{background:var(--red-lt);color:var(--red)}
+
+/* filters */
+.fbar{position:sticky;top:0;z-index:25;background:rgba(243,243,243,.97);backdrop-filter:blur(6px);padding:12px 24px;border-bottom:1px solid var(--line)}
+.frow{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.fld{display:flex;flex-direction:column;gap:2px;flex:1 1 150px;min-width:130px;max-width:230px}
+.fld label{font-size:12px;color:var(--text-2)}
+.fld select,.fld input{height:32px;border:1px solid var(--input);border-radius:4px;background:#fff;padding:0 8px;width:100%}
+.fld select.on,.fld input.on{border-color:var(--brand);box-shadow:inset 0 0 0 1px var(--brand);background:var(--sky-xl)}
+.fact{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap}
+.btn{height:32px;padding:0 14px;border-radius:4px;border:1px solid var(--input);background:#fff;color:var(--brand);font-weight:600;cursor:pointer}
+.btn:hover{background:var(--sky-xl)}
+.btn.brand{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn.brand:hover{background:var(--brand-dk)}
+.more{display:none;margin-top:10px}.more.open{display:flex}
+.scope{margin-top:8px;font-size:12px;color:var(--text-2);display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.pillf{display:inline-flex;align-items:center;gap:2px;background:#fff;border:1px solid var(--input);border-radius:15px;padding:1px 3px 1px 10px;color:var(--text);font-weight:600}
+.pillf button{all:unset;cursor:pointer;width:18px;height:18px;border-radius:9px;display:grid;place-items:center;color:var(--text-3)}
+.pillf button:hover{background:var(--line);color:var(--text)}
+
+main{padding:16px 24px 64px}
+.page{display:none}.page.on{display:block}
+.grid{display:grid;gap:16px;margin-bottom:16px;grid-template-columns:minmax(0,1fr)}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g32{grid-template-columns:minmax(0,3fr) minmax(0,2fr)}.g23{grid-template-columns:minmax(0,2fr) minmax(0,3fr)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:4px;box-shadow:var(--shadow);min-width:0}
+.ch{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:12px 16px 0}
+.ch h2{margin:0;font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px}
+.ch p{margin:2px 0 0;color:var(--text-3);font-size:12px}
+.cb{padding:12px 16px 16px}
+.cb.flush{padding:8px 0 0}
+.ico{width:24px;height:24px;border-radius:4px;display:inline-grid;place-items:center;color:#fff;flex:none}
+.ico svg{width:14px;height:14px;fill:#fff}
+.foot{color:var(--text-3);font-size:11.5px;padding:0 16px 12px}
+details.how{padding:0 16px 12px;color:var(--text-2);font-size:12px}
+details.how summary{cursor:pointer;color:var(--brand);font-weight:600;list-style:none}
+details.how summary::-webkit-details-marker{display:none}
+details.how summary::before{content:"ⓘ ";}
+details.how p{margin:6px 0 0;max-width:90ch}
+
+/* KPI highlights */
+.kpis{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:12px;margin-bottom:16px}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:4px;box-shadow:var(--shadow);padding:12px 14px;position:relative;overflow:hidden;min-width:0}
+.kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--c,var(--brand))}
+.kpi .k{font-size:12px;color:var(--text-2);display:flex;justify-content:space-between;gap:6px}
+.kpi .v{font-size:22px;font-weight:700;letter-spacing:-.01em;margin-top:2px;white-space:nowrap}
+.kpi .d{font-size:11.5px;color:var(--text-3);margin-top:1px}
+.kpi .v.red{color:var(--red)}.kpi .v.green{color:var(--green)}.kpi .v.amber{color:var(--amber)}
+.meter{height:6px;background:var(--line-2);border-radius:3px;margin-top:8px;position:relative}
+.meter i{position:absolute;left:0;top:0;bottom:0;border-radius:3px}
+.meter b{position:absolute;top:-3px;width:2px;height:12px;background:var(--text)}
+
+/* insights */
+.ai-card{position:relative;border:0;background:#fff;border-radius:6px;box-shadow:var(--shadow);padding:1px}
+.ai-card::before{content:"";position:absolute;inset:0;border-radius:6px;padding:1.5px;background:var(--ai);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
+.ai-head{display:flex;align-items:center;gap:10px;padding:12px 16px 4px}
+.ai-head h2{margin:0;font-size:14px;font-weight:700;background:var(--ai);-webkit-background-clip:text;background-clip:text;color:transparent}
+.ai-head .chip{font-size:11px;color:var(--purple);background:var(--purple-lt);border-radius:10px;padding:1px 8px;font-weight:600}
+.ins{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0;padding:4px 8px 10px}
+.ins.full{grid-template-columns:repeat(2,minmax(0,1fr))}
+.in{display:flex;gap:10px;padding:10px 8px;border-bottom:1px solid var(--line-2)}
+.in .dot{width:8px;flex:none;border-radius:4px;margin-top:4px;height:30px}
+.in h3{margin:0;font-size:13px;font-weight:700}
+.in p{margin:2px 0 0;color:var(--text-2);font-size:12.5px}
+.in .act{margin-top:4px;font-size:12px;color:var(--brand);cursor:pointer;background:none;border:0;padding:0;font-weight:600}
+.sev-risk .dot{background:var(--red)}.sev-watch .dot{background:var(--orange)}.sev-good .dot{background:var(--green)}.sev-info .dot{background:var(--brand)}
+
+/* tables */
+.tw{overflow:auto;max-height:520px}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{position:sticky;top:0;background:#FAFAF9;text-align:left;font-weight:700;color:var(--text-2);font-size:12px;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap;cursor:pointer;user-select:none;z-index:1}
+th.n,td.n{text-align:right;white-space:nowrap}
+th[aria-sort="descending"]::after{content:" ▾";color:var(--brand)}
+th[aria-sort="ascending"]::after{content:" ▴";color:var(--brand)}
+td{padding:7px 10px;border-bottom:1px solid var(--line-2);vertical-align:middle}
+tbody tr:hover td{background:var(--sky-xl)}
+.nm{font-weight:600}
+.mt{display:block;color:var(--text-3);font-size:11.5px}
+.flink{color:var(--brand);text-decoration:none;font-weight:600}
+.flink:hover{text-decoration:underline}
+.bdg{display:inline-block;padding:1px 8px;border-radius:12px;font-size:11.5px;font-weight:600;white-space:nowrap}
+.bdg.ok{background:var(--green-lt);color:var(--green)}.bdg.watch{background:var(--amber-bg);color:var(--amber)}.bdg.over{background:var(--red-lt);color:var(--red)}.bdg.na{background:var(--line-2);color:var(--text-3)}.bdg.info{background:var(--sky-lt);color:var(--brand-dk)}
+.bar{height:8px;background:var(--line-2);border-radius:4px;position:relative;min-width:90px}
+.bar i{position:absolute;left:0;top:0;bottom:0;border-radius:4px}
+.bar b{position:absolute;top:-3px;width:2px;height:14px;background:var(--text)}
+.mix{display:flex;height:8px;border-radius:4px;overflow:hidden;min-width:110px;background:var(--line-2)}
+.mix i{display:block;height:100%}
+.empty{padding:26px;text-align:center;color:var(--text-3)}
+.tog{all:unset;cursor:pointer;width:18px;display:inline-block;color:var(--brand);font-weight:700}
+.l1 td:first-child{padding-left:30px}.l2 td:first-child{padding-left:54px}
+.l0 td{font-weight:600}
+.heat td.h{text-align:right;font-variant-numeric:tabular-nums}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:11.5px;color:var(--text-2);padding:0 16px}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.legend i{width:10px;height:10px;border-radius:2px;display:inline-block}
+.tsearch{height:30px;border:1px solid var(--input);border-radius:4px;padding:0 8px;width:220px}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}
+.score{display:inline-grid;place-items:center;width:26px;height:22px;border-radius:4px;font-weight:700;font-size:11.5px}
+
+/* charts */
+.chart{position:relative;height:260px}
+.chart.tall{height:330px}.chart.short{height:200px}
+.chart svg{display:block;width:100%;height:100%;overflow:visible}
+.chart text{font-family:var(--font);fill:#5C5C5C;font-size:11px}
+.tip{position:fixed;pointer-events:none;background:#032D60;color:#fff;border-radius:6px;padding:8px 10px;font-size:12px;line-height:1.45;box-shadow:0 4px 14px rgba(0,0,0,.18);z-index:90;max-width:300px;display:none}
+.tip b{font-weight:700}.tip .r{display:flex;gap:8px;justify-content:space-between}.tip i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:6px}
+
+/* policy page */
+.pol{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;max-width:1100px}
+.pol .card{padding:18px 20px}
+.pol h3{margin:0 0 10px;font-size:15px;display:flex;gap:10px;align-items:center}
+.lim{display:flex;justify-content:space-between;align-items:baseline;padding:10px 0;border-top:1px solid var(--line-2)}
+.lim span{color:var(--text-2)}.lim b{font-size:18px}
+.pol .note{color:var(--text-2);font-size:13px;margin:8px 0 0}
+
+/* assistant */
+.asst{position:fixed;right:20px;bottom:20px;z-index:60}
+.fab{width:56px;height:56px;border-radius:50%;border:0;background:var(--ai);color:#fff;cursor:pointer;box-shadow:0 6px 18px rgba(1,68,134,.35);display:grid;place-items:center}
+.fab svg{width:26px;height:26px;fill:#fff}
+.drawer{position:fixed;right:20px;bottom:88px;width:400px;max-width:calc(100vw - 24px);height:min(620px,calc(100vh - 120px));background:#fff;border-radius:10px;box-shadow:0 12px 40px rgba(3,45,96,.28);display:none;flex-direction:column;overflow:hidden;z-index:61}
+.drawer.open{display:flex}
+.dh{background:var(--ai);color:#fff;padding:12px 14px;display:flex;align-items:center;gap:10px}
+.dh b{font-size:14px}.dh span{font-size:11.5px;opacity:.85;display:block}
+.dh button{margin-left:auto;all:unset;cursor:pointer;width:28px;height:28px;border-radius:14px;display:grid;place-items:center;font-size:18px}
+.dh button:hover{background:rgba(255,255,255,.15)}
+.msgs{flex:1;overflow:auto;padding:12px;background:#FAFAF9;display:flex;flex-direction:column;gap:10px}
+.m{max-width:92%;padding:9px 11px;border-radius:10px;font-size:12.5px;line-height:1.5}
+.m.u{align-self:flex-end;background:var(--brand);color:#fff;border-bottom-right-radius:3px}
+.m.b{align-self:flex-start;background:#fff;border:1px solid var(--line);border-bottom-left-radius:3px}
+.m.b table{font-size:12px;margin-top:6px}
+.m.b td,.m.b th{padding:4px 6px}
+.m.b .acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.m.b .acts button{border:1px solid var(--input);background:#fff;border-radius:14px;padding:2px 10px;cursor:pointer;color:var(--brand);font-weight:600;font-size:12px}
+.sugg{display:flex;gap:6px;flex-wrap:wrap;padding:8px 12px;border-top:1px solid var(--line);background:#fff}
+.sugg button{border:1px solid #D8CBF7;background:var(--purple-lt);color:var(--purple);border-radius:14px;padding:3px 10px;cursor:pointer;font-size:12px;font-weight:600}
+.din{display:flex;gap:8px;padding:10px 12px;border-top:1px solid var(--line);background:#fff}
+.din input{flex:1;height:36px;border:1px solid var(--input);border-radius:18px;padding:0 14px}
+.din button{height:36px;border-radius:18px;border:0;background:var(--brand);color:#fff;padding:0 16px;font-weight:700;cursor:pointer}
+
+/* lock */
+.lock[hidden]{display:none!important}
+.lock{position:fixed;inset:0;background:linear-gradient(120deg,#032D60,#014486 50%,#0176D3);display:grid;place-items:center;z-index:200;padding:20px}
+.lock .box{background:#fff;border-radius:8px;box-shadow:0 20px 60px rgba(0,0,0,.3);width:400px;max-width:100%;padding:28px}
+.lock h1{font-size:18px;margin:14px 0 4px}.lock p{color:var(--text-2);margin:0 0 16px}
+.lock input{width:100%;height:38px;border:1px solid var(--input);border-radius:4px;padding:0 10px;font-size:14px}
+.lock button{margin-top:12px;width:100%;height:38px;border:0;border-radius:4px;background:var(--brand);color:#fff;font-weight:700;cursor:pointer;font-size:14px}
+.lock .err{color:var(--red);font-size:12.5px;min-height:18px;margin-top:8px}
+
+@media (max-width:1280px){.kpis{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media (max-width:980px){.g2,.g3,.g32,.g23,.ins,.ins.full,.pol{grid-template-columns:minmax(0,1fr)}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.fbar{position:static}.gh .who{display:none}}
+@media (max-width:560px){main,.fbar,.band{padding-left:12px;padding-right:12px}.fld{max-width:none}.band h1{font-size:20px}.gh .app span{display:none}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+@media print{.fbar,.asst,.tabs,.gh .ghbtn{display:none!important}.page{display:block!important;break-after:page}}
+
+/* ===== premium layer (v3) ===== */
+html,body{background:radial-gradient(1100px 520px at 8% -8%,#E6F0FF 0%,rgba(230,240,255,0) 60%),radial-gradient(900px 480px at 108% -4%,#F1EAFE 0%,rgba(241,234,254,0) 55%),#F3F5F9;}
+.gh{background:rgba(255,255,255,.86);-webkit-backdrop-filter:saturate(160%) blur(10px);backdrop-filter:saturate(160%) blur(10px);box-shadow:0 1px 0 rgba(3,45,96,.06),0 8px 24px -18px rgba(3,45,96,.35);}
+.logo{box-shadow:0 6px 14px -6px rgba(1,68,134,.7),inset 0 1px 0 rgba(255,255,255,.35);}
+.band{box-shadow:0 18px 40px -26px rgba(3,45,96,.7);}
+.tabs button[aria-selected="true"]{box-shadow:0 -3px 0 #0176D3 inset,0 10px 18px -14px rgba(3,45,96,.6);}
+.card{border-radius:10px;box-shadow:0 1px 0 rgba(255,255,255,.9) inset,0 1px 2px rgba(3,45,96,.05),0 14px 30px -22px rgba(3,45,96,.32);transition:box-shadow .3s ease;}
+.card:hover{box-shadow:0 1px 0 rgba(255,255,255,.9) inset,0 2px 4px rgba(3,45,96,.06),0 20px 36px -22px rgba(3,45,96,.40);}
+.ch h2{letter-spacing:-.01em;}
+.kpi{border-radius:10px;transform-style:preserve-3d;transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:transform .35s cubic-bezier(.2,.7,.2,1),box-shadow .35s ease;background:linear-gradient(180deg,#FFFFFF 0%,#FAFBFD 100%);box-shadow:0 1px 0 rgba(255,255,255,.95) inset,0 2px 4px rgba(3,45,96,.06),0 20px 34px -22px rgba(3,45,96,.5);will-change:transform;}
+.kpi::before{width:5px;border-radius:10px 0 0 10px;box-shadow:2px 0 10px -2px var(--c,#0176D3);}
+.kpi::after{content:"";position:absolute;inset:0;border-radius:inherit;background:radial-gradient(240px circle at var(--mx,50%) var(--my,25%),rgba(255,255,255,.7),rgba(255,255,255,0) 62%);pointer-events:none;opacity:var(--gl,0);transition:opacity .3s ease;}
+.kpi:hover{--gl:1;box-shadow:0 1px 0 rgba(255,255,255,.95) inset,0 4px 8px rgba(3,45,96,.08),0 30px 44px -24px rgba(3,45,96,.55);}
+.kpi .v{text-shadow:0 1px 0 rgba(255,255,255,.7);}
+.chart svg{filter:drop-shadow(0 6px 8px rgba(3,45,96,.12));overflow:visible;}
+.bar,.mix,.meter{box-shadow:inset 0 1px 2px rgba(3,45,96,.12);}
+.bdg{box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 1px 2px rgba(3,45,96,.10);}
+.ai-card{box-shadow:0 1px 0 rgba(255,255,255,.9) inset,0 22px 40px -28px rgba(88,38,227,.45);}
+.btn{box-shadow:0 1px 0 rgba(255,255,255,.9) inset,0 1px 2px rgba(3,45,96,.08);transition:transform .15s ease,box-shadow .15s ease;}
+.btn:hover{transform:translateY(-1px);box-shadow:0 1px 0 rgba(255,255,255,.9) inset,0 6px 14px -8px rgba(3,45,96,.5);}
+.btn.brand{background:linear-gradient(180deg,#1A86E8 0%,#0170C4 100%);box-shadow:0 1px 0 rgba(255,255,255,.25) inset,0 8px 16px -10px rgba(1,112,196,.9);}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none;}
+.kbdhint{font-size:11.5px;color:var(--text-3);padding:4px 0 0;}
+.tie{display:flex;gap:8px;align-items:center;margin:0 16px 14px;padding:8px 12px;border-radius:8px;background:linear-gradient(90deg,#EBF7E6,#F5FBF2);color:#2E844A;font-size:12px;box-shadow:0 1px 0 rgba(255,255,255,.8) inset;}
+.tie b{font-weight:800;}
+.tie.warn{background:linear-gradient(90deg,#FEF1E1,#FFF8EE);color:#A96404;}
+.banner{padding:10px 14px;border-radius:8px;background:#FEF1E1;color:#5C3300;border:1px solid #F2C27E;margin:0 0 12px;font-size:13px;}
+.banner.ok{background:#EBF7E6;color:#1F5C33;border-color:#BFE3B0;}
+.banner.warn{background:#FEF1E1;color:#5C3300;border-color:#F2C27E;}
+/* messages */
+.msgwrap{display:grid;grid-template-columns:minmax(300px,380px) minmax(0,1fr);gap:16px;align-items:start;}
+@media (max-width:1000px){.msgwrap{grid-template-columns:minmax(0,1fr);}}
+.msgcol{position:sticky;top:132px;}
+.msgtools{padding:12px 16px 4px;display:grid;gap:8px;}
+.msgtools input[type=search]{height:34px;border:1px solid #C9C9C9;border-radius:6px;padding:0 10px;width:100%;}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:#EEF1F5;border-radius:8px;padding:3px;}
+.seg button{all:unset;cursor:pointer;text-align:center;padding:6px 8px;border-radius:6px;font-size:12px;font-weight:600;color:#44546B;}
+.seg button[aria-pressed="true"]{background:#fff;color:#032D60;box-shadow:0 1px 2px rgba(3,45,96,.15);}
+.msgbtns{display:flex;gap:8px;flex-wrap:wrap;}
+.msgbtns .btn{height:30px;font-size:12px;padding:0 10px;}
+.rlist{max-height:520px;overflow:auto;padding:6px 8px 10px;}
+.rcp{display:grid;grid-template-columns:18px 1fr auto;grid-template-areas:"cb nm st" "cb kd mail";gap:2px 8px;align-items:center;padding:8px 8px;border-radius:8px;cursor:pointer;border-bottom:1px solid #F0F2F5;}
+.rcp:hover{background:#F6F9FD;}
+.rcp.on{background:#EEF4FF;}
+.rcp input{grid-area:cb;margin:0;}
+.rcp .nm{grid-area:nm;font-weight:600;font-size:13px;}
+.rcp .st{grid-area:st;}
+.rcp .kind{grid-area:kd;font-size:11.5px;color:#747474;}
+.rcp .mail{grid-area:mail;font-size:11px;}
+.mail.ok{color:#2E844A;}.mail.no{color:#A96404;}
+.tplgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:8px 0 14px;}
+@media (max-width:1200px){.tplgrid{grid-template-columns:repeat(2,minmax(0,1fr));}}
+.tpl{position:relative;display:grid;gap:4px;padding:12px 12px 12px 14px;border:1px solid #DCE3EC;border-radius:10px;cursor:pointer;background:linear-gradient(180deg,#fff,#FAFBFD);box-shadow:0 1px 0 rgba(255,255,255,.9) inset,0 6px 14px -12px rgba(3,45,96,.4);transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease;}
+.tpl:hover{transform:translateY(-2px);box-shadow:0 1px 0 rgba(255,255,255,.9) inset,0 14px 22px -16px rgba(3,45,96,.5);}
+.tpl.on{border-color:#0176D3;box-shadow:0 0 0 2px rgba(1,118,211,.18),0 14px 24px -16px rgba(1,118,211,.7);}
+.tpl input{position:absolute;opacity:0;pointer-events:none;}
+.tpl b{font-size:13px;}
+.tpl span{font-size:12px;color:#5C6B7E;line-height:1.4;}
+.sect{margin:0 0 6px;font-size:12.5px;font-weight:800;letter-spacing:.02em;color:#44546B;text-transform:uppercase;}
+.msgmain textarea{width:100%;border:1px solid #C9C9C9;border-radius:8px;padding:10px 12px;font:inherit;font-size:13px;resize:vertical;}
+.count{font-size:11.5px;color:#747474;text-align:right;margin-top:4px;}
+.prevhead{display:flex;justify-content:space-between;align-items:center;}
+.pnav{display:flex;gap:6px;align-items:center;font-size:12px;color:#747474;}
+.pnav button{all:unset;cursor:pointer;width:26px;height:26px;border-radius:13px;text-align:center;line-height:26px;border:1px solid #DCE3EC;background:#fff;}
+.pnav button:hover{background:#F6F9FD;}
+.slack{background:#fff;border:1px solid #E3E6EA;border-left:4px solid #0176D3;border-radius:8px;padding:14px 16px;box-shadow:0 12px 24px -18px rgba(3,45,96,.45);font-size:13px;color:#1D1C1D;}
+.slack .ttl{font-weight:800;font-size:15px;margin-bottom:8px;}
+.slack .body{line-height:1.55;}
+.slack .body .q{border-left:3px solid #D0D5DD;padding-left:10px;color:#616061;margin:6px 0;}
+.slack .body .gap{height:8px;}
+.slack .foot{font-size:11.5px;color:#616061;margin-top:10px;}
+.slack .open{display:inline-block;margin-top:10px;border:1px solid #DDD;border-radius:6px;padding:6px 12px;font-weight:700;color:#1264A3;background:#fff;}
+.pfor{font-size:11.5px;color:#747474;margin-top:8px;}
+.sendbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:14px 0;padding:12px 14px;border-radius:10px;background:#fff;border:1px solid #DCE3EC;box-shadow:0 10px 20px -16px rgba(3,45,96,.45);}
+.sendbar .hint{font-size:12.5px;color:#44546B;}
+.scrim{position:fixed;inset:0;background:rgba(3,45,96,.38);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);display:grid;place-items:center;z-index:120;padding:16px;}
+.scrim[hidden]{display:none;}
+.modal{background:#fff;border-radius:12px;box-shadow:0 30px 60px -20px rgba(3,45,96,.6);width:min(520px,100%);padding:20px 22px;max-height:86vh;overflow:auto;}
+.modal h3{margin:0 0 8px;font-size:17px;}
+.mnote{font-size:13px;color:#44546B;line-height:1.5;}
+.mlist{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0;max-height:180px;overflow:auto;}
+.chip2{background:#EEF4FF;color:#032D60;border-radius:14px;padding:3px 10px;font-size:12px;font-weight:600;}
+.confirm{display:flex;gap:8px;align-items:flex-start;font-size:13px;margin:10px 0;}
+.mbtns{display:flex;justify-content:flex-end;gap:8px;margin-top:12px;}
+.fail{font-size:13px;padding:6px 0;border-bottom:1px solid #F0F2F5;}
+.msgtable td{font-size:12px;}
+</style>
+</head>
+<body>
+<div class="lock" id="lock">
+  <div class="box" id="lockForm"></div>
+</div>
+
+<header class="gh">
+  <div class="logo" aria-hidden="true">T&amp;E</div>
+  <div class="app">T&amp;E Command Center<span>South Asia · Finance</span></div>
+  <div class="sp"></div>
+  <div class="who" id="freshness"></div>
+  <button class="ghbtn" id="csvBtn">Export lines</button>
+  <button class="ghbtn ai" id="askTop"><svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" style="fill:#fff"><path d="M12 2l1.8 5.2L19 9l-5.2 1.8L12 16l-1.8-5.2L5 9l5.2-1.8zM19 14l.9 2.6 2.6.9-2.6.9L19 21l-.9-2.6-2.6-.9 2.6-.9z"/></svg>Ask T&amp;E</button>
+</header>
+<section class="band">
+  <div class="crumb" id="crumb">Q3 FY27 · Aug 1 to Oct 31, 2026</div>
+  <h1 id="title">Overview</h1>
+  <div class="sub" id="subtitle"></div>
+  <nav class="tabs" role="tablist" id="tabs" aria-label="Dashboard pages">
+    <button role="tab" data-p="overview" aria-selected="true">Overview</button>
+    <button role="tab" data-p="insights">Insights</button>
+    <button role="tab" data-p="leaders">Leaders</button>
+    <button role="tab" data-p="people">Employees</button>
+    <button role="tab" data-p="cats">Categories</button>
+    <button role="tab" data-p="travel">Travel</button>
+    <button role="tab" data-p="ta">Travel approvals &amp; commit</button>
+    <button role="tab" data-p="controls">Policy &amp; controls <span class="badge" id="flagBadge"></span></button>
+    <button role="tab" data-p="policy">Policy limits</button>
+    <button role="tab" data-p="messages">Messages <span class="badge" id="msgBadge"></span></button>
+  </nav>
+</section>
+<section class="fbar" id="fbar" aria-label="Filters">
+  <div class="frow">
+    <div class="fld"><label for="f_ou">Region</label><select id="f_ou"></select></div>
+    <div class="fld"><label for="f_ld">Leader</label><select id="f_ld"></select></div>
+    <div class="fld"><label for="f_l1">Leader+1</label><select id="f_l1"></select></div>
+    <div class="fld"><label for="f_l2">Leader+2</label><select id="f_l2"></select></div>
+    <div class="fld"><label for="f_e">Employee</label><select id="f_e"></select></div>
+    <div class="fact"><button class="btn" id="moreBtn" aria-expanded="false" aria-controls="more">More filters</button><button class="btn" id="resetBtn">Reset</button></div>
+  </div>
+  <div class="frow more" id="more">
+    <div class="fld"><label for="f_ow">Budget owner</label><select id="f_ow"></select></div>
+    <div class="fld"><label for="f_cat">Category</label><select id="f_cat"></select></div>
+    <div class="fld"><label for="f_p">Report purpose</label><select id="f_p"></select></div>
+    <div class="fld"><label for="f_s">Approval status</label><select id="f_s"></select></div>
+    <div class="fld"><label for="f_q">Search</label><input id="f_q" type="search" placeholder="Name, vendor or city"></div>
+  </div>
+  <div class="scope" id="scope"></div>
+  <div class="kbdhint">Keys: 1–9 change page · / search · Esc closes</div>
+</section>
+<main id="main">
+<section class="page on" id="p-overview">
+  <div class="kpis" id="kpis"></div>
+  <div class="ai-card" style="margin-bottom:16px">
+    <div class="ai-head"><span class="ico" style="background:var(--ai)"><svg viewBox="0 0 24 24"><path d="M12 2l1.8 5.2L19 9l-5.2 1.8L12 16l-1.8-5.2L5 9l5.2-1.8z"/></svg></span><h2>What needs attention</h2><span class="chip">Insights from this data</span><span style="flex:1"></span><button class="btn" data-go="insights">See all insights</button></div>
+    <div class="ins" id="insTop"></div>
+  </div>
+  <div class="grid g32">
+    <div class="card"><div class="ch"><div><h2>Where the quarter lands</h2><p id="burnSub"></p></div></div>
+      <div class="legend" style="margin-top:8px"><span><i style="background:#0176D3"></i>Actual cumulative</span><span><i style="background:#9050E9"></i>Projected</span><span><i style="background:#747474"></i>Even budget pace</span><span><i style="background:#BA0517"></i>Budget</span></div>
+      <div class="cb"><div class="chart tall" id="cBurn"></div></div></div>
+    <div class="card"><div class="ch"><div><h2>How the forecast is built</h2><p>From spend to date to projected landing.</p></div></div>
+      <div class="cb"><div class="chart tall" id="cWater"></div></div>
+      <details class="how"><summary>How this is calculated</summary><p id="howForecast"></p></details></div>
+  </div>
+  <div class="grid g32">
+    <div class="card"><div class="ch"><div><h2>Weekly spend by category</h2><p>Fiscal weeks run Sunday to Saturday. Shaded bars are the projection.</p></div></div>
+      <div class="legend" id="lgWeekly" style="margin-top:8px"></div><div class="cb"><div class="chart" id="cWeekly"></div></div></div>
+    <div class="card"><div class="ch"><div><h2>Region view</h2><p>Spend, budget and projected landing.</p></div></div><div class="cb" id="regions"></div></div>
+  </div>
+  <div class="card"><div class="ch"><div><h2>Budget owner pacing</h2><p id="ownSub"></p></div></div><div class="cb flush"><div class="tw" id="tOwners"></div></div></div>
+  <div class="tie" id="tie-overview"></div>
+</section>
+
+<section class="page" id="p-insights">
+  <div class="ai-card"><div class="ai-head"><span class="ico" style="background:var(--ai)"><svg viewBox="0 0 24 24"><path d="M12 2l1.8 5.2L19 9l-5.2 1.8L12 16l-1.8-5.2L5 9l5.2-1.8z"/></svg></span><h2>All insights for this view</h2><span class="chip" id="insCount"></span></div>
+    <div class="ins full" id="insAll"></div>
+    <div class="foot">Insights are recalculated from the lines in the current filter whenever you change it. They come from rules and statistics applied to this data, so check the numbers before acting on them.</div></div>
+</section>
+
+<section class="page" id="p-leaders">
+  <div class="card" style="margin-bottom:16px"><div class="ch"><div><h2>Leader scorecard</h2><p>One row per leader. The rating dots compare each leader with the others in view.</p></div></div><div class="cb flush"><div class="tw" id="tScore" style="max-height:600px"></div></div></div>
+  <div class="grid g2">
+    <div class="card"><div class="ch"><div><h2>Spend by leader</h2><p>Top 15 leaders, split by category.</p></div></div><div class="legend" id="lgLead" style="margin-top:8px"></div><div class="cb"><div class="chart tall" id="cLeaders"></div></div></div>
+    <div class="card"><div class="ch"><div><h2>Leader trend</h2><p>Weekly spend for the five largest leaders, to the last complete week.</p></div></div><div class="legend" id="lgLT" style="margin-top:8px"></div><div class="cb"><div class="chart tall" id="cLeadTrend"></div></div></div>
+  </div>
+  <div class="card" style="margin-bottom:16px"><div class="ch"><div><h2>Org drill-down</h2><p>Leader, then Leader+1, then Leader+2. Select ▸ to expand.</p></div><button class="btn" id="expandAll">Expand all</button></div><div class="cb flush"><div class="tw" id="tTree" style="max-height:640px"></div></div></div>
+  <div class="card"><div class="ch"><div><h2>Leader by category</h2><p>Darker cells hold a larger share of that leader's spend.</p></div></div><div class="cb flush"><div class="tw" id="tHeat"></div></div></div>
+  <div class="tie" id="tie-leaders"></div>
+</section>
+
+<section class="page" id="p-people">
+  <div class="stats" id="pStats"></div>
+  <div class="grid g2">
+    <div class="card"><div class="ch"><div><h2>Spend concentration</h2><p>Cumulative share of spend by employees ranked from highest.</p></div></div><div class="cb"><div class="chart" id="cPareto"></div></div></div>
+    <div class="card"><div class="ch"><div><h2>Employees by spend band</h2><p>How many people fall in each quarter-to-date band.</p></div></div><div class="cb"><div class="chart" id="cBands"></div></div></div>
+  </div>
+  <div class="card"><div class="ch"><div><h2>Employee spend</h2><p>Select a column to sort. Select a name to focus the whole dashboard on that person. Flagged is the gross value of lines that break a rule.</p></div><input class="tsearch" id="empSearch" type="search" placeholder="Find an employee" aria-label="Find an employee"></div><div class="cb flush"><div class="tw" id="tEmp" style="max-height:640px"></div></div></div>
+  <div class="tie" id="tie-people"></div>
+</section>
+
+<section class="page" id="p-cats">
+  <div class="grid g23">
+    <div class="card"><div class="ch"><div><h2>Spend by category</h2><p>Share of spend in view.</p></div></div><div class="cb"><div class="chart" id="cCat"></div></div></div>
+    <div class="card"><div class="ch"><div><h2>Category trend</h2><p>Weekly spend by category, to the last complete week.</p></div></div><div class="legend" id="lgCT" style="margin-top:8px"></div><div class="cb"><div class="chart" id="cCatTrend"></div></div></div>
+  </div>
+  <div class="grid g2">
+    <div class="card"><div class="ch"><div><h2>Month on month</h2><p>August and September actuals with October projected at the current pace.</p></div></div><div class="cb flush"><div class="tw" id="tMonth"></div></div></div>
+    <div class="card"><div class="ch"><div><h2>Spend by report purpose</h2><p id="purpSub"></p></div></div><div class="cb"><div class="chart" id="cPurp"></div></div></div>
+  </div>
+  <div class="grid g2">
+    <div class="card"><div class="ch"><div><h2>Customer-facing share by leader</h2><p>Customer-facing travel plus client meals and entertainment.</p></div></div><div class="cb"><div class="chart tall" id="cCust"></div></div></div>
+    <div class="card"><div class="ch"><div><h2>Weekday pattern</h2><p>Average spend per calendar day, by day of the week.</p></div></div><div class="cb"><div class="chart tall" id="cDow"></div></div></div>
+  </div>
+  <div class="card"><div class="ch"><div><h2>Expense types</h2><p>Week change compares the last two complete weeks, leaving out Dreamforce and kickoff spend.</p></div></div><div class="cb flush"><div class="tw" id="tTypes"></div></div></div>
+  <div class="tie" id="tie-cats"></div>
+</section>
+
+<section class="page" id="p-travel">
+  <div class="stats" id="aStats"></div>
+  <div class="grid g2">
+    <div class="card"><div class="ch"><div><h2>Booking lead time</h2><p>Tickets by days booked ahead (bars) and average fare (line).</p></div></div><div class="cb"><div class="chart" id="cAdv"></div></div></div>
+    <div class="card"><div class="ch"><div><h2>Airfare by route type</h2><p>Spend and average fare.</p></div></div><div class="cb"><div class="chart" id="cScope"></div></div></div>
+  </div>
+  <div class="grid g2">
+    <div class="card"><div class="ch"><div><h2>Top routes</h2><p>By airfare spend.</p></div></div><div class="cb flush"><div class="tw" id="tRoutes" style="max-height:420px"></div></div></div>
+    <div class="card"><div class="ch"><div><h2>Airlines and travel agency</h2><p>Airfare and booking fees by vendor.</p></div></div><div class="cb"><div class="chart tall" id="cAirline"></div></div></div>
+  </div>
+  <div class="grid g2">
+    <div class="card"><div class="ch"><div><h2>Average hotel night by city</h2><p>Top 12 cities by hotel spend. Red bars are above the $300 international cap.</p></div></div><div class="cb"><div class="chart tall" id="cHotel"></div></div></div>
+    <div class="card"><div class="ch"><div><h2>Top vendors</h2><p>Spelling variants grouped, for example every Uber or Grab entity.</p></div></div><div class="cb"><div class="chart tall" id="cVendor"></div></div></div>
+  </div>
+  <div class="card"><div class="ch"><div><h2>Top destinations</h2><p>Spend by expense city, split by category.</p></div></div><div class="legend" id="lgCity" style="margin-top:8px"></div><div class="cb"><div class="chart" id="cCity"></div></div></div>
+</section>
+
+<section class="page" id="p-ta">
+  <div class="kpis" id="taKpis" style="grid-template-columns:repeat(6,minmax(0,1fr))"></div>
+  <div class="grid g2">
+    <div class="card"><div class="ch"><div><h2>From approvals to open commit</h2><p>What part of the approved travel lands in Q3, and what is still to come.</p></div></div><div class="cb"><div class="chart tall" id="cTaWater"></div></div>
+      <details class="how"><summary>How this is calculated</summary><p id="howTa"></p></details></div>
+    <div class="card"><div class="ch"><div><h2>Commit by travel week</h2><p>Estimated cost recognised in Q3, by the week the trip happens.</p></div></div>
+      <div class="legend" style="margin-top:8px"><span><i style="background:#0176D3"></i>Already incurred (estimate)</span><span><i style="background:#9050E9"></i>Approved, still to come</span><span><i style="background:#D8CBF7"></i>Expected, not yet approved</span></div>
+      <div class="cb"><div class="chart tall" id="cTaWeek"></div></div></div>
+  </div>
+  <div class="grid g2">
+    <div class="card"><div class="ch"><div><h2>Approved travel by reason</h2><p>Domestic and international estimate.</p></div></div><div class="cb"><div class="chart" id="cTaReason"></div></div></div>
+    <div class="card"><div class="ch"><div><h2>How far ahead travel is approved</h2><p>Approvals by days between approval and trip start.</p></div></div><div class="cb"><div class="chart" id="cLead"></div></div></div>
+  </div>
+  <div class="card" style="margin-bottom:16px"><div class="ch"><div><h2>Commit and accuracy by leader</h2><p>Accuracy compares actual trip spend so far with the approved estimate for the same trip days.</p></div></div><div class="cb flush"><div class="tw" id="tTaLeader"></div></div></div>
+  <div class="card"><div class="ch"><div><h2>Travel spend with no approval on file</h2><p>Employees with airfare or hotel spend but no travel approval in the TA sheet.</p></div></div><div class="cb flush"><div class="tw" id="tNoTa"></div></div><div class="foot" id="taFix"></div></div>
+</section>
+
+<section class="page" id="p-controls">
+  <div class="stats" id="cStats"></div>
+  <div class="grid g2">
+    <div class="card"><div class="ch"><div><h2>Policy exceptions by type</h2><p>Spend on lines that break a policy limit. A line can break more than one.</p></div></div><div class="cb"><div class="chart" id="cFlags"></div></div></div>
+    <div class="card"><div class="ch"><div><h2>Approval status</h2><p>Where each line sits in the expense workflow.</p></div></div><div class="cb"><div class="chart" id="cStatus"></div></div></div>
+  </div>
+  <div class="grid g2">
+    <div class="card"><div class="ch"><div><h2>Age of unsubmitted spend</h2><p id="agingSub"></p></div></div><div class="cb"><div class="chart short" id="cAging"></div></div></div>
+    <div class="card"><div class="ch"><div><h2>Data gaps</h2><p>Items that limit how precisely spend can be attributed.</p></div></div><div class="cb flush" id="dq"></div></div>
+  </div>
+  <div class="card" style="margin-bottom:16px"><div class="ch"><div><h2>Exceptions by leader</h2><p>Exception rate is flagged spend as a share of the leader's spend.</p></div></div><div class="cb flush"><div class="tw" id="tCtlLeader"></div></div></div>
+  <div class="card"><div class="ch"><div><h2>Employees with the most flagged spend</h2><p>Select a name to focus the dashboard on that person.</p></div></div><div class="cb flush"><div class="tw" id="tCtlEmp"></div></div></div>
+</section>
+
+<section class="page" id="p-policy"><div class="pol" id="pol"></div></section>
+
+<section class="page" id="p-messages">
+  <div id="msgBanner"></div>
+  <div class="msgwrap" id="msgWrap" hidden>
+    <div class="card msgcol">
+      <div class="ch"><div><h2>Recipients</h2><p id="msgCount">Choose who should receive the message.</p></div></div>
+      <div class="msgtools">
+        <input id="msgQ" type="search" placeholder="Search people" aria-label="Search people">
+        <div class="seg" id="msgFilters" role="group" aria-label="Filter recipients">
+          <button data-f="all" aria-pressed="true">Everyone</button><button data-f="budget">Budget holders</button><button data-f="managers">Managers</button><button data-f="attention">Needs attention</button>
+        </div>
+        <div class="msgbtns"><button class="btn" id="selAttn">Select needs attention</button><button class="btn" id="selNone">Clear</button></div>
+      </div>
+      <div class="rlist" id="rlist"></div>
+      <div class="foot">Budget holders show their budget status from their own pacing. A dash means that budget is not visible to you.</div>
+    </div>
+    <div class="msgmain">
+      <div class="card" style="padding:16px 18px">
+        <h3 class="sect">1 · Message type</h3>
+        <div class="tplgrid" id="tplgrid"></div>
+        <h3 class="sect">2 · Optional note</h3>
+        <textarea id="msgNote" rows="3" maxlength="500" placeholder="A personal note. It appears at the top of the message." aria-label="Optional note"></textarea>
+        <div class="count"><span id="noteCount">0</span>/500</div>
+      </div>
+      <div class="card" style="padding:16px 18px;margin-top:14px">
+        <div class="prevhead"><h3 class="sect">3 · Preview</h3><div class="pnav"><button id="pPrev" aria-label="Previous sample">‹</button><span id="pIdx"></span><button id="pNext" aria-label="Next sample">›</button></div></div>
+        <div id="preview"><div class="empty">Select recipients to see exactly what each one will receive.</div></div>
+      </div>
+      <div class="sendbar"><div class="hint" id="sendHint"></div><button class="btn brand" id="sendBtn" disabled>Review and send</button></div>
+      <div class="card" style="padding:0">
+        <div class="ch" style="padding:14px 16px 0"><div><h2>Sent messages</h2><p>Admins see everyone's. Everyone else sees their own.</p></div></div>
+        <div class="cb flush"><div class="tw" id="msgLog" style="max-height:340px"></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="scrim" id="scrim" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle" id="modal"></div></div>
+</section>
+</main>
+<div class="tip" id="tip" role="tooltip"></div>
+<div class="asst">
+  <div class="drawer" id="drawer" role="dialog" aria-label="Ask T&amp;E assistant">
+    <div class="dh"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" style="fill:#fff"><path d="M12 2l1.8 5.2L19 9l-5.2 1.8L12 16l-1.8-5.2L5 9l5.2-1.8zM19 14l.9 2.6 2.6.9-2.6.9L19 21l-.9-2.6-2.6-.9 2.6-.9z"/></svg><div><b>Ask T&amp;E</b><span>Answers from the data in this dashboard</span></div><button id="closeAsk" aria-label="Close assistant">×</button></div>
+    <div class="msgs" id="msgs" aria-live="polite"></div>
+    <div class="sugg" id="sugg"></div>
+    <form class="din" id="askForm"><input id="askIn" placeholder="Ask about spend, budgets, people, travel…" aria-label="Your question" autocomplete="off"><button type="submit">Ask</button></form>
+  </div>
+  <button class="fab" id="fab" aria-label="Open Ask T&amp;E assistant"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l1.8 5.2L19 9l-5.2 1.8L12 16l-1.8-5.2L5 9l5.2-1.8zM19 14l.9 2.6 2.6.9-2.6.9L19 21l-.9-2.6-2.6-.9 2.6-.9z"/></svg></button>
+</div>
+<script>
+// ---------- SVG chart engine (no external libraries) ----------
+const NS='http://www.w3.org/2000/svg';
+const CHARTS={};
+function sv(tag,at,parent){const e=document.createElementNS(NS,tag);for(const k in at)if(at[k]!=null)e.setAttribute(k,at[k]);if(parent)parent.appendChild(e);return e;}
+function niceStep(range,n){const raw=range/Math.max(1,n);const p=Math.pow(10,Math.floor(Math.log10(raw||1)));const m=raw/p;return (m<=1?1:m<=2?2:m<=2.5?2.5:m<=5?5:10)*p;}
+function ticks(min,max,n){if(min===max){max=min+1;}const st=niceStep(max-min,n);const lo=Math.floor(min/st)*st,hi=Math.ceil(max/st)*st;const out=[];for(let v=lo;v<=hi+st/2;v+=st)out.push(+v.toFixed(10));return out;}
+const TIP=()=>document.getElementById('tip');
+function showTip(ev,html){const t=TIP();t.innerHTML=html;t.style.display='block';const w=t.offsetWidth,h=t.offsetHeight;let x=ev.clientX+14,y=ev.clientY+14;if(x+w>window.innerWidth-8)x=ev.clientX-w-14;if(y+h>window.innerHeight-8)y=ev.clientY-h-14;t.style.left=x+'px';t.style.top=y+'px';}
+function hideTip(){TIP().style.display='none';}
+function tipRows(title,rows){return '<b>'+esc(title)+'</b>'+rows.map(r=>'<div class="r"><span><i style="background:'+r.c+'"></i>'+esc(r.n)+'</span><b>'+r.v+'</b></div>').join('');}
+function textW(s){return String(s).length*6.3;}
+
+/* spec: {type:'bar'|'line'|'hbar'|'donut'|'waterfall', labels, series:[{name,data,color,kind:'bar'|'line',stack,dash,fill,axis,width,ghost}],
+          fmt, fmt2, title:i=>string, hline:[{v,c,dash,label}], vline:{i,label}, xEvery, yZero, colorAt:(s,i)=>color, xTitle, yTitle, xNumeric}
+*/
+function chart(id,spec){CHARTS[id]=spec;drawChart(id);}
+function drawChart(id){
+  const el=document.getElementById(id),spec=CHARTS[id];if(!el||!spec)return;
+  el.innerHTML='';const W=el.clientWidth,H=el.clientHeight;if(W<40||H<40)return;
+  const s=sv('svg',{viewBox:'0 0 '+W+' '+H,role:'img','aria-label':spec.aria||el.closest('.card')?.querySelector('h2')?.textContent||'chart'},el);
+  if(spec.empty||!spec.labels||!spec.labels.length){const t=sv('text',{x:W/2,y:H/2,'text-anchor':'middle'},s);t.textContent='No data for this view';return;}
+  ({bar:drawXY,line:drawXY,hbar:drawH,donut:drawDonut,waterfall:drawWater,scatter:drawXY})[spec.type](s,W,H,spec);
+}
+let rT;window.addEventListener('resize',()=>{clearTimeout(rT);rT=setTimeout(()=>{for(const id in CHARTS){const el=document.getElementById(id);if(el&&el.offsetParent)drawChart(id);}},150);});
+
+function gradOf(s,col){if(!col||col[0]!=='#')return col;let d=s.querySelector('defs');if(!d)d=sv('defs',{},s);const id='g'+col.slice(1);if(!d.querySelector('#'+id)){const g=sv('linearGradient',{id,x1:'0',y1:'0',x2:'0',y2:'1'},d);sv('stop',{offset:'0%','stop-color':col,'stop-opacity':1},g);sv('stop',{offset:'100%','stop-color':col,'stop-opacity':0.74},g);}return 'url(#'+id+')';}
+function drawXY(s,W,H,sp){
+  const fmt=sp.fmt||(v=>v),fmt2=sp.fmt2||fmt;
+  const L=sp.labels,n=L.length,ser=sp.series;
+  // value extents (stack bars)
+  const stacks={};let mn=0,mx=0,mn2=0,mx2=0;const has2=ser.some(x=>x.axis==='y2');
+  ser.forEach(x=>{if((x.kind||sp.type)==='bar'&&x.axis!=='y2'){const k=x.stack||x.name;stacks[k]=stacks[k]||{p:new Array(n).fill(0),m:new Array(n).fill(0)};x.data.forEach((v,i)=>{if(v==null)return;if(v>=0)stacks[k].p[i]+=v;else stacks[k].m[i]+=v;});}});
+  for(const k in stacks){mx=Math.max(mx,...stacks[k].p);mn=Math.min(mn,...stacks[k].m);}
+  ser.forEach(x=>{if((x.kind||sp.type)!=='bar'||x.axis==='y2'){x.data.forEach(v=>{if(v==null)return;const y=typeof v==='object'?v.y:v;if(x.axis==='y2'){mx2=Math.max(mx2,y);mn2=Math.min(mn2,y);}else{mx=Math.max(mx,y);mn=Math.min(mn,y);}});}});
+  (sp.hline||[]).forEach(h=>{mx=Math.max(mx,h.v);});
+  if(mn<0&&-mn<0.04*mx)mn=0;
+  if(sp.yMax!=null)mx=sp.yMax;if(sp.yMin!=null)mn=sp.yMin;
+  const yt=ticks(mn,mx,5),y2t=has2?ticks(mn2,mx2,5):null;
+  const ml=Math.max(...yt.map(v=>textW(fmt(v))))+12,mr=has2?Math.max(...y2t.map(v=>textW(fmt2(v))))+12:10,mt=10,mb=sp.xTitle?40:26;
+  const pw=W-ml-mr,ph=H-mt-mb;
+  const y0=yt[0],y1=yt[yt.length-1];const Y=v=>mt+ph-(v-y0)/(y1-y0)*ph;
+  const Y2=has2?(v=>mt+ph-(v-y2t[0])/(y2t[y2t.length-1]-y2t[0])*ph):null;
+  const numeric=!!sp.xNumeric;const xmin=numeric?sp.xMin:0,xmax=numeric?sp.xMax:n;
+  const bw=pw/n;const X=i=>ml+bw*i+bw/2;const XN=v=>ml+(v-xmin)/(xmax-xmin)*pw;
+  const g=sv('g',{},s);
+  yt.forEach(v=>{sv('line',{x1:ml,x2:W-mr,y1:Y(v),y2:Y(v),stroke:v===0?'#C9C9C9':'#EEEEEE'},g);const t=sv('text',{x:ml-8,y:Y(v)+4,'text-anchor':'end'},g);t.textContent=fmt(v);});
+  if(has2)y2t.forEach(v=>{const t=sv('text',{x:W-mr+8,y:Y2(v)+4},g);t.textContent=fmt2(v);});
+  // x labels
+  if(numeric){ticks(xmin,xmax,5).forEach(v=>{if(v<xmin||v>xmax)return;const t=sv('text',{x:XN(v),y:H-mb+16,'text-anchor':'middle'},g);t.textContent=(sp.xfmt||(x=>x))(v);});}
+  else{const every=sp.xEvery||Math.max(1,Math.ceil(n/Math.max(1,Math.floor(pw/Math.max(46,Math.max(...L.map(l=>textW(l)))+8)))));
+    L.forEach((l,i)=>{if(i%every!==0&&i!==n-1)return;if(i===n-1&&i%every!==0&&(n-1)%every<every*0.6)return;const t=sv('text',{x:X(i),y:H-mb+16,'text-anchor':'middle'},g);t.textContent=l;});}
+  if(sp.xTitle){const t=sv('text',{x:ml+pw/2,y:H-6,'text-anchor':'middle',fill:'#747474'},g);t.textContent=sp.xTitle;}
+  if(sp.vline!=null){const x=X(sp.vline.i)+(sp.vline.off||0)*bw;sv('line',{x1:x,x2:x,y1:mt,y2:mt+ph,stroke:'#747474','stroke-dasharray':'3 3'},g);if(sp.vline.label){const t=sv('text',{x:x+4,y:mt+10,fill:'#444'},g);t.textContent=sp.vline.label;}}
+  // bars
+  const barSer=ser.filter(x=>(x.kind||sp.type)==='bar'&&x.axis!=='y2');const groups=[...new Set(barSer.map(x=>x.stack||x.name))];
+  const gw=Math.min(bw*0.72,sp.maxBar||46);const sw=gw/Math.max(1,groups.length);
+  const acc={};groups.forEach(k=>acc[k]={p:new Array(n).fill(0),m:new Array(n).fill(0)});
+  barSer.forEach(x=>{const k=x.stack||x.name,gi=groups.indexOf(k);x.data.forEach((v,i)=>{if(v==null||v===0)return;const base=v>=0?acc[k].p[i]:acc[k].m[i];const top=base+v;if(v>=0)acc[k].p[i]=top;else acc[k].m[i]=top;
+    const ya=Y(Math.max(base,top)),yb=Y(Math.min(base,top));const col=sp.colorAt?sp.colorAt(x,i):x.color;
+    sv('rect',{x:X(i)-gw/2+gi*sw,y:ya,width:Math.max(1,sw-1),height:Math.max(0.5,yb-ya),fill:gradOf(s,col),opacity:x.ghost?0.45:1,rx:1.5,stroke:x.ghost?x.color:null,'stroke-dasharray':x.ghost?'3 2':null},g);});});
+  // lines
+  ser.filter(x=>(x.kind||sp.type)==='line'||x.axis==='y2'||sp.type==='scatter').forEach(x=>{
+    const yf=x.axis==='y2'?Y2:Y;let d='',area='',started=false,first=null,last=null;
+    x.data.forEach((v,i)=>{if(v==null){started=false;return;}const px=numeric?XN(v.x):X(i),py=yf(numeric?v.y:v);d+=(started?'L':'M')+px.toFixed(1)+' '+py.toFixed(1);if(!started&&first==null)first=px;started=true;last=px;});
+    if(x.fill&&first!=null){area=d+'L'+last.toFixed(1)+' '+yf(Math.max(y0,0))+'L'+first.toFixed(1)+' '+yf(Math.max(y0,0))+'Z';sv('path',{d:area,fill:x.color,opacity:.10},g);}
+    sv('path',{d,fill:'none',stroke:x.color,'stroke-width':x.width||2,'stroke-dasharray':x.dash||null,'stroke-linejoin':'round','stroke-linecap':'round'},g);
+    if(x.points)x.data.forEach((v,i)=>{if(v==null)return;sv('circle',{cx:numeric?XN(v.x):X(i),cy:yf(numeric?v.y:v),r:3.2,fill:'#fff',stroke:x.color,'stroke-width':2},g);});
+  });
+  (sp.hline||[]).forEach(h=>{sv('line',{x1:ml,x2:W-mr,y1:Y(h.v),y2:Y(h.v),stroke:h.c,'stroke-width':1.5,'stroke-dasharray':h.dash||null},g);if(h.label){const t=sv('text',{x:W-mr-4,y:Y(h.v)-5,'text-anchor':'end',fill:h.c,'font-weight':700},g);t.textContent=h.label;}});
+  // hover
+  const guide=sv('line',{x1:0,x2:0,y1:mt,y2:mt+ph,stroke:'#0176D3','stroke-width':1,opacity:0},g);
+  const hit=sv('rect',{x:ml,y:mt,width:pw,height:ph,fill:'transparent'},s);
+  hit.addEventListener('mousemove',ev=>{const r=s.getBoundingClientRect();const mxp=(ev.clientX-r.left)*(W/r.width);let i;
+    if(numeric){const v=xmin+(mxp-ml)/pw*(xmax-xmin);const d0=ser[0].data;let best=0,bd=1e18;d0.forEach((p,j)=>{const dd=Math.abs(p.x-v);if(dd<bd){bd=dd;best=j;}});i=best;guide.setAttribute('x1',XN(d0[i].x));guide.setAttribute('x2',XN(d0[i].x));}
+    else{i=Math.max(0,Math.min(n-1,Math.floor((mxp-ml)/bw)));guide.setAttribute('x1',X(i));guide.setAttribute('x2',X(i));}
+    guide.setAttribute('opacity',sp.type==='bar'?0:.5);
+    const rows=ser.filter(x=>!x.noTip).map(x=>{const v=x.data[i];if(v==null||(typeof v==='number'&&v===0&&sp.skipZero!==false))return null;return {n:x.name,c:x.color,v:(x.axis==='y2'?fmt2:fmt)(typeof v==='object'?v.y:v)};}).filter(Boolean);
+    if(!rows.length&&!sp.title){hideTip();return;}
+    showTip(ev,(sp.tipFn?sp.tipFn(i):tipRows(sp.title?sp.title(i):L[i],rows)));});
+  hit.addEventListener('mouseleave',()=>{hideTip();guide.setAttribute('opacity',0);});
+}
+function drawH(s,W,H,sp){
+  const fmt=sp.fmt||(v=>v),L=sp.labels,n=L.length,ser=sp.series;
+  const tot=new Array(n).fill(0),neg=new Array(n).fill(0);ser.forEach(x=>x.data.forEach((v,i)=>{if(v>0)tot[i]+=v;else if(v<0)neg[i]+=v;}));
+  let mx=Math.max(0,...tot),mn=Math.min(0,...neg);if(sp.xMax!=null)mx=sp.xMax;if(sp.xMin!=null)mn=sp.xMin;
+  (sp.vlines||[]).forEach(h=>mx=Math.max(mx,h.v));
+  const xt=ticks(mn,mx,4);const lab=Math.min(W*0.42,Math.max(...L.map(l=>textW(l)))+10);
+  const ml=lab+6,mr=Math.max(14,textW(fmt(xt[xt.length-1]))/2+4),mt=4,mb=22,pw=W-ml-mr,ph=H-mt-mb;
+  const x0=xt[0],x1=xt[xt.length-1];const X=v=>ml+(v-x0)/(x1-x0)*pw;const bh=ph/n;const Yc=i=>mt+bh*i+bh/2;
+  const g=sv('g',{},s);
+  xt.forEach(v=>{sv('line',{x1:X(v),x2:X(v),y1:mt,y2:mt+ph,stroke:v===0?'#C9C9C9':'#EEEEEE'},g);const t=sv('text',{x:X(v),y:H-6,'text-anchor':'middle'},g);t.textContent=fmt(v);});
+  L.forEach((l,i)=>{let tx=l;const maxc=Math.floor(lab/6.3);if(tx.length>maxc)tx=tx.slice(0,maxc-1)+'…';const t=sv('text',{x:lab,y:Yc(i)+4,'text-anchor':'end',fill:'#181818'},g);t.textContent=tx;});
+  const hh=Math.min(bh*0.66,20);const accP=new Array(n).fill(0),accM=new Array(n).fill(0);
+  ser.forEach(x=>x.data.forEach((v,i)=>{if(!v)return;const b=v>=0?accP[i]:accM[i];const e=b+v;if(v>=0)accP[i]=e;else accM[i]=e;const xa=X(Math.min(b,e)),xb=X(Math.max(b,e));
+    sv('rect',{x:xa,y:Yc(i)-hh/2,width:Math.max(1,xb-xa),height:hh,fill:gradOf(s,sp.colorAt?sp.colorAt(x,i):x.color),rx:2},g);}));
+  if(sp.valueLabels)L.forEach((l,i)=>{const t=sv('text',{x:X(accP[i])+5,y:Yc(i)+4,fill:'#444'},g);t.textContent=sp.valueLabels(i);});
+  (sp.vlines||[]).forEach(h=>{sv('line',{x1:X(h.v),x2:X(h.v),y1:mt,y2:mt+ph,stroke:h.c,'stroke-dasharray':'4 3','stroke-width':1.5},g);});
+  const hit=sv('rect',{x:0,y:mt,width:W,height:ph,fill:'transparent'},s);
+  hit.addEventListener('mousemove',ev=>{const r=s.getBoundingClientRect();const my=(ev.clientY-r.top)*(H/r.height);const i=Math.max(0,Math.min(n-1,Math.floor((my-mt)/bh)));
+    const rows=ser.map(x=>x.data[i]?{n:x.name||'Value',c:sp.colorAt?sp.colorAt(x,i):x.color,v:fmt(x.data[i])}:null).filter(Boolean);
+    showTip(ev,sp.tipFn?sp.tipFn(i):tipRows(L[i],rows));});
+  hit.addEventListener('mouseleave',hideTip);
+}
+function drawDonut(s,W,H,sp){
+  const v=sp.series[0].data.map(x=>Math.max(0,x)),tot=v.reduce((a,b)=>a+b,0),cols=sp.series[0].colors;const fmt=sp.fmt||(x=>x);
+  const legW=Math.min(260,W*0.5);const R=Math.min((W-legW)/2-10,H/2-10),cx=(W-legW)/2,cy=H/2,r0=R*0.62;let a=-Math.PI/2;
+  const g=sv('g',{},s);
+  v.forEach((x,i)=>{if(!x)return;const a2=a+x/tot*Math.PI*2;const large=a2-a>Math.PI?1:0;
+    const p=['M',cx+R*Math.cos(a),cy+R*Math.sin(a),'A',R,R,0,large,1,cx+R*Math.cos(a2),cy+R*Math.sin(a2),'L',cx+r0*Math.cos(a2),cy+r0*Math.sin(a2),'A',r0,r0,0,large,0,cx+r0*Math.cos(a),cy+r0*Math.sin(a),'Z'].join(' ');
+    const path=sv('path',{d:p,fill:cols[i],stroke:'#fff','stroke-width':2},g);
+    path.addEventListener('mousemove',ev=>showTip(ev,tipRows(sp.labels[i],[{n:'Spend',c:cols[i],v:fmt(sp.series[0].data[i])},{n:'Share',c:cols[i],v:pc(tot?x/tot:0)}])));path.addEventListener('mouseleave',hideTip);a=a2;});
+  const t1=sv('text',{x:cx,y:cy-2,'text-anchor':'middle','font-size':18,'font-weight':700,fill:'#181818'},g);t1.textContent=fmt(sp.series[0].data.reduce((a,b)=>a+b,0));
+  const t2=sv('text',{x:cx,y:cy+16,'text-anchor':'middle'},g);t2.textContent='total';
+  const lx=W-legW+8;sp.labels.forEach((l,i)=>{const y=cy-(sp.labels.length*22)/2+i*22+12;sv('rect',{x:lx,y:y-9,width:10,height:10,rx:2,fill:cols[i]},g);const t=sv('text',{x:lx+16,y,fill:'#181818'},g);t.textContent=l;const t3=sv('text',{x:W-4,y,'text-anchor':'end','font-weight':700,fill:'#181818'},g);t3.textContent=fmt(sp.series[0].data[i])+'  '+pc(tot?v[i]/tot:0);});
+}
+function drawWater(s,W,H,sp){
+  // items: [{label,v,kind:'total'|'delta',color}]
+  const it=sp.items,fmt=sp.fmt;let run=0;const bars=it.map(x=>{if(x.kind==='total'){const b={lo:0,hi:x.v,x};run=x.v;return b;}const b={lo:run,hi:run+x.v,x};run+=x.v;return b;});
+  let mx=Math.max(...bars.map(b=>Math.max(b.lo,b.hi)),...(sp.hline||[]).map(h=>h.v)),mn=Math.min(0,...bars.map(b=>Math.min(b.lo,b.hi)));
+  const yt=ticks(mn,mx,5);const ml=Math.max(...yt.map(v=>textW(fmt(v))))+12,mr=10,mt=18,mb=44,pw=W-ml-mr,ph=H-mt-mb;
+  const Y=v=>mt+ph-(v-yt[0])/(yt[yt.length-1]-yt[0])*ph;const n=it.length,bw=pw/n,X=i=>ml+bw*i+bw/2;const g=sv('g',{},s);
+  yt.forEach(v=>{sv('line',{x1:ml,x2:W-mr,y1:Y(v),y2:Y(v),stroke:'#EEEEEE'},g);const t=sv('text',{x:ml-8,y:Y(v)+4,'text-anchor':'end'},g);t.textContent=fmt(v);});
+  const w=Math.min(bw*0.62,64);
+  bars.forEach((b,i)=>{const ya=Y(Math.max(b.lo,b.hi)),yb=Y(Math.min(b.lo,b.hi));const r=sv('rect',{x:X(i)-w/2,y:ya,width:w,height:Math.max(1,yb-ya),fill:gradOf(s,b.x.color),rx:2},g);
+    if(i<n-1){const nx=bars[i+1];sv('line',{x1:X(i)+w/2,x2:X(i+1)-w/2,y1:Y(b.hi),y2:Y(b.hi),stroke:'#B0ADAB','stroke-dasharray':'2 2'},g);}
+    const t=sv('text',{x:X(i),y:ya-5,'text-anchor':'middle','font-weight':700,fill:'#181818'},g);t.textContent=(b.x.kind==='delta'&&b.x.v>0?'+':'')+fmt(b.x.v);
+    const words=b.x.label.split(' ');let line='',lines=[];words.forEach(wd=>{if(textW(line+' '+wd)>bw-4&&line){lines.push(line);line=wd;}else line=line?line+' '+wd:wd;});lines.push(line);
+    lines.slice(0,3).forEach((ln,j)=>{const tt=sv('text',{x:X(i),y:H-mb+14+j*12,'text-anchor':'middle'},g);tt.textContent=ln;});
+    r.addEventListener('mousemove',ev=>showTip(ev,'<b>'+esc(b.x.label)+'</b><div>'+$f(b.x.v)+'</div>'+(b.x.note?'<div style="opacity:.85;margin-top:4px">'+esc(b.x.note)+'</div>':'')));r.addEventListener('mouseleave',hideTip);});
+  (sp.hline||[]).forEach(h=>{sv('line',{x1:ml,x2:W-mr,y1:Y(h.v),y2:Y(h.v),stroke:h.c,'stroke-width':1.5,'stroke-dasharray':'5 4'},g);const t=sv('text',{x:ml+4,y:Y(h.v)-5,fill:h.c,'font-weight':700},g);t.textContent=h.label+' '+fmt(h.v);});
+}
+
+// ---------- shared helpers ----------
+function $k(n){if(n==null||isNaN(n))return '–';const a=Math.abs(n),s=n<0?'−':'';if(a>=1e6)return s+'$'+(a/1e6).toFixed(2)+'M';if(a>=1e5)return s+'$'+Math.round(a/1e3)+'K';if(a>=1e3)return s+'$'+(a/1e3).toFixed(1)+'K';return s+'$'+Math.round(a);}
+function $f(n){if(n==null||isNaN(n))return '–';return (n<0?'−':'')+'$'+Math.round(Math.abs(n)).toLocaleString('en-US');}
+function pc(n,dp){if(n==null||!isFinite(n))return '–';return (n*100).toFixed(dp==null?0:dp)+'%';}
+function int(n){return Math.round(n).toLocaleString('en-US');}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function signed(n){return (n>0?'+':'')+$k(n);}
+
+function boot(P){
+'use strict';
+const M=P.meta,DI=P.dict,TX=P.tx,TA=P.ta,N=TX.a.length,NT=TA.e.length;
+const Q0=new Date(M.qStart+'T00:00:00'),LC=M.lastComplete,QD=M.qDays,REMAIN=QD-(LC+1),LAST=M.lastDay;
+const CATS=M.cats;
+const CC={'Airfare':'#0176D3','Lodging':'#06A59A','Ground transport':'#FE9339','Meals':'#9050E9','Entertainment':'#D83A86','Booking & fees':'#8E9CAD'};
+const FLBL={air_cap:'Airfare over limit',hotel_cap:'Hotel over nightly limit',premium:'Business or first class',late:'Flight booked 3 days or less ahead',freeze:'Internal travel during freeze',split:'Possible split receipt'};
+const EVENTS=new Set(M.events.map(e=>DI.p.indexOf(e)).filter(i=>i>=0));
+const NOTAPP=new Set(DI.s.map((s,i)=>s==='Approved'?-1:i).filter(i=>i>=0));
+const TRAVX=new Set(DI.x.map((x,i)=>['Airfare','Hotel & Lodging','Room Tax','Hotel Deposit','Subway/Train/Trolley - Cross State/Country'].includes(x)?i:-1).filter(i=>i>=0));
+const AIRX=DI.x.indexOf('Airfare'),HOTX=DI.x.indexOf('Hotel & Lodging'),FEEX=DI.x.indexOf('Travel/Booking Fees');
+const CI=new Int8Array(N),WK=new Int8Array(N);const xcat=DI.x.map(x=>CATS.indexOf(M.x2cat[x]));
+function weekOf(d){return d<=0?1:Math.floor((d-1)/7)+2;}
+for(let i=0;i<N;i++){CI[i]=xcat[TX.x[i]];WK[i]=weekOf(TX.d[i]);}
+const NW=weekOf(QD-1),LASTW=weekOf(LAST);
+function wStart(w){return w===1?0:1+(w-2)*7;}
+function dDate(d){const x=new Date(Q0);x.setDate(x.getDate()+d);return x;}
+const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function dL(d){const x=dDate(d);return MON[x.getMonth()]+' '+x.getDate();}
+function wL(w){return 'Wk '+w;}
+function wR(w){const s=wStart(w),e=Math.min(QD-1,w===1?0:s+6);return dL(s)+(e>s?' to '+dL(e):'');}
+const LCW=dDate(LC).getDay()===6?weekOf(LC):weekOf(LC)-1; // last complete week
+const COV=M.cov;function cov(k){return COV[Math.min(COV.length-1,Math.max(0,k))];}
+
+// ---------- filters ----------
+const PHS=new Set(['Above your level','Own spend or direct reports','No second level','No budget line']);
+const lineOf=(a,b)=>PHS.has(b)?esc(a):esc(a)+' → '+esc(b);
+const FK=['ou','ow','ld','l1','l2','e','cat','p','s'],HIER=['ou','ow','ld','l1','l2','e'],TAK=['ou','ow','ld','l1','l2','e'];
+const F={ou:-1,ow:-1,ld:-1,l1:-1,l2:-1,e:-1,cat:-1,p:-1,s:-1,q:''};
+const FN={ou:'Region',ow:'Budget owner',ld:'Leader',l1:'Leader+1',l2:'Leader+2',e:'Employee',cat:'Category',p:'Purpose',s:'Status'};
+const rv=(k,i)=>k==='cat'?CI[i]:TX[k][i];const dictOf=k=>k==='cat'?CATS:DI[k];
+let HAY=null;function hay(i){if(!HAY){HAY=new Array(N);for(let j=0;j<N;j++)HAY[j]=(DI.e[TX.e[j]]+'|'+DI.v[TX.v[j]]+'|'+DI.ld[TX.ld[j]]+'|'+DI.l1[TX.l1[j]]+'|'+DI.l2[TX.l2[j]]+'|'+DI.c[TX.c[j]]).toLowerCase();}return HAY[i];}
+function pass(i){for(const k of FK){const v=F[k];if(v<0)continue;
+  if(k==='ld'){const nm=DI.ld[v],oi=DI.ow.indexOf(nm);if(oi>=0){if(TX.ow[i]!==oi)return false;}else{if(TX.ld[i]!==v)return false;}continue;}
+  if(rv(k,i)!==v)return false;}if(F.q&&!hay(i).includes(F.q))return false;return true;}
+function passTA(j){for(const k of TAK){const v=F[k];if(v<0)continue;
+  if(k==='ld'){const nm=DI.ld[v],oi=DI.ow.indexOf(nm);if(oi>=0){if(TA.ow[j]!==oi)return false;}else{if(TA.ld[j]!==v)return false;}continue;}
+  if(TA[k][j]!==v)return false;}if(F.q){const h=(DI.e[TA.e[j]]+'|'+DI.ld[TA.ld[j]]+'|'+DI.l1[TA.l1[j]]+'|'+DI.l2[TA.l2[j]]+'|'+TA.route[j]).toLowerCase();if(!h.includes(F.q))return false;}return true;}
+function fillSel(k){const el=document.getElementById('f_'+k),d=dictOf(k),hi=HIER.indexOf(k),cnt=new Map();
+  for(let i=0;i<N;i++){let ok=true;for(const kk of FK){if(kk===k)continue;const hj=HIER.indexOf(kk);if(hi>=0&&hj>hi)continue;const v=F[kk];if(v<0)continue;if(kk==='ld'){const nm=DI.ld[v],oi=DI.ow.indexOf(nm);if(oi>=0){if(TX.ow[i]!==oi){ok=false;break;}}else{if(TX.ld[i]!==v){ok=false;break;}}continue;}if(rv(kk,i)!==v){ok=false;break;}}if(!ok)continue;
+    if(k==='ld'){cnt.set(rv(k,i),1);const own=DI.ow[TX.ow[i]];if(own&&own!=='No budget line'){const owi=DI.ld.indexOf(own);if(owi>=0)cnt.set(owi,1);}}else cnt.set(rv(k,i),1);}
+  const ids=[...cnt.keys()].filter(v=>v>=0&&d[v]!==''&&!PHS.has(d[v])).sort((a,b)=>String(d[a]).localeCompare(String(d[b])));
+  const all={ou:'All regions',ow:'All budget owners',ld:'All leaders',l1:'All',l2:'All',e:'All employees',cat:'All categories',p:'All purposes',s:'All statuses'}[k];
+  el.innerHTML='<option value="-1">'+all+'</option>'+ids.map(v=>'<option value="'+v+'">'+esc(d[v])+'</option>').join('');
+  if(F[k]>=0&&!cnt.has(F[k]))F[k]=-1;el.value=String(F[k]);el.classList.toggle('on',F[k]>=0);}
+function fillAll(){FK.forEach(fillSel);document.getElementById('f_q').classList.toggle('on',!!F.q);}
+FK.forEach(k=>document.getElementById('f_'+k).addEventListener('change',e=>{F[k]=+e.target.value;fillAll();refresh();}));
+let qT;document.getElementById('f_q').addEventListener('input',e=>{clearTimeout(qT);qT=setTimeout(()=>{F.q=e.target.value.trim().toLowerCase();fillAll();refresh();},250);});
+document.getElementById('resetBtn').onclick=()=>{FK.forEach(k=>F[k]=-1);F.q='';document.getElementById('f_q').value='';fillAll();refresh();};
+document.getElementById('moreBtn').onclick=e=>{const m=document.getElementById('more');const o=m.classList.toggle('open');e.currentTarget.setAttribute('aria-expanded',o);};
+function filterTo(k,name){const v=dictOf(k).indexOf(name);if(v<0)return false;F[k]=v;fillAll();refresh();window.scrollTo({top:0,behavior:'smooth'});return true;}
+document.addEventListener('click',e=>{const a=e.target.closest('[data-fk]');if(a){e.preventDefault();filterTo(a.dataset.fk,a.dataset.fv);return;}const g=e.target.closest('[data-go]');if(g){e.preventDefault();go(g.dataset.go);}});
+function scopeName(){for(const k of ['e','l2','l1','ld','ow','ou'])if(F[k]>=0)return dictOf(k)[F[k]];return M.scopeKind==='all'?'South Asia':M.scope;}
+function renderScope(){const el=document.getElementById('scope');const parts=[];
+  for(const k of FK)if(F[k]>=0)parts.push('<span class="pillf">'+FN[k]+': '+esc(dictOf(k)[F[k]])+'<button aria-label="Remove '+FN[k]+' filter" data-rm="'+k+'">×</button></span>');
+  if(F.q)parts.push('<span class="pillf">Search: '+esc(F.q)+'<button aria-label="Clear search" data-rm="q">×</button></span>');
+  el.innerHTML=(parts.length?'Showing ':'Showing everything in this dashboard, ')+parts.join(' ')+' <span>'+int(IDX.length)+' expense lines, '+int(TIX.length)+' travel approvals</span>';
+  el.querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{const k=b.dataset.rm;if(k==='q'){F.q='';document.getElementById('f_q').value='';}else F[k]=-1;fillAll();refresh();});}
+
+// ---------- whole-population structures ----------
+const BUD=P.budget.map(b=>({...b,oui:DI.ou.indexOf(b.ou),owi:DI.ow.indexOf(b.n)}));
+const ownFull=new Map();for(let i=0;i<N;i++){const k=TX.ou[i]+'|'+TX.ow[i];ownFull.set(k,(ownFull.get(k)||0)+TX.a[i]);}
+const NOBUD=DI.ow.indexOf('No budget line');
+
+// ---------- aggregation ----------
+let IDX=[],TIX=[];
+function sum(ix){let s=0;for(const i of ix)s+=TX.a[i];return s;}
+function grp(ix,kf){const m=new Map();for(const i of ix){const k=kf(i);let o=m.get(k);if(!o){o={k,a:0,n:0,rows:[]};m.set(k,o);}o.a+=TX.a[i];o.n++;o.rows.push(i);}return m;}
+function catSums(ix){const c=new Float64Array(6);for(const i of ix)c[CI[i]]+=TX.a[i];return c;}
+const orgF=()=>F.ld>=0||F.l1>=0||F.l2>=0||F.e>=0||!!F.q;const sliceF=()=>F.cat>=0||F.p>=0||F.s>=0;
+function runRate(ix){let s=0;for(const i of ix)if(TX.d[i]<=LC&&!EVENTS.has(TX.p[i]))s+=TX.a[i];return s/(LC+1);}
+/* TA-informed forecast. Remaining quarter = day-to-day spend + approved trip costs still to be incurred + expected trips not yet approved + airfare still to be booked */
+function forecast(ix,tix){
+  const qtd=sum(ix);const rr=runRate(ix);
+  if(sliceF())return {qtd,land:qtd+rr*REMAIN,rr,mode:'runrate',base:rr*REMAIN};
+  let base=0,air=0;for(const i of ix){if(TX.d[i]>LC||EVENTS.has(TX.p[i]))continue;if(TX.x[i]===AIRX)air+=TX.a[i];else if(!TX.lk[i])base+=TX.a[i];}
+  base=base/(LC+1)*REMAIN;air=air/(LC+1)*REMAIN;
+  let openNon=0,unr=0,openAir=0;for(const j of tix){openNon+=TA.open_nonair[j];unr+=TA.exp_unraised[j];openAir+=TA.open_air[j];}
+  const airF=Math.max(openAir,air);
+  const land=qtd+base+openNon+unr+airF;
+  return {qtd,base,openNon,unr,openAir,airF,airRate:air,land,rr,rrLand:qtd+rr*REMAIN,mode:'ta'};
+}
+function dailyPath(ix,tix,fc){ // projected daily spend after LC for the burn chart
+  const out=new Float64Array(QD);if(fc.mode!=='ta'){for(let d=LC+1;d<QD;d++)out[d]=fc.rr;return out;}
+  const flat=(fc.base+fc.airF)/REMAIN;for(let d=LC+1;d<QD;d++)out[d]=flat;
+  for(const j of tix){const nd=TA.days[j],per=TA.nonair[j]/nd;for(let d=Math.max(TA.sday[j],LC+1);d<=Math.min(TA.eday[j],QD-1);d++)out[d]+=per/cov(d-LC);}
+  return out;}
+function scopeBudget(ix){
+  if(sliceF())return {b:null,mode:'slice',lines:[]};
+  const org=orgF();const own=grp(ix,i=>TX.ou[i]+'|'+TX.ow[i]);const lines=[];let tot=0,pr=false;
+  for(const b of BUD){if(F.ou>=0&&b.oui!==F.ou)continue;if(F.ow>=0&&b.owi!==F.ow)continue;const k=b.oui+'|'+b.owi,g=own.get(k);if(org&&!g)continue;
+    let sh=1;if(org){const full=ownFull.get(k)||0,s=g?g.a:0;sh=full>0?Math.max(0,Math.min(1,s/full)):1;if(sh<0.995)pr=true;}
+    const bb=b.b*sh;tot+=bb;lines.push({...b,b:bb,sh,rows:g?g.rows:[]});}
+  return {b:tot,mode:org?(pr?'prorated':'full'):(BUD.some(b=>b.share<0.995)?'leaderfile':'full'),lines};}
+function taFor(ou,ow){const r=[];for(const j of TIX)if(TA.ou[j]===ou&&TA.ow[j]===ow)r.push(j);return r;}
+function status(land,b,q){if(!b)return ['na','No budget'];if(q>b)return ['over','Over budget'];if(land>b)return ['over','Projected over'];if(land>0.92*b)return ['watch','Watch'];return ['ok','On track'];}
+
+// ---------- tables ----------
+const TS={};
+function table(id,cols,rows,opt){opt=opt||{};const st=TS[id]||(TS[id]={k:opt.sort,dir:-1});const el=document.getElementById(id);if(!el)return;
+  if(!rows.length){el.innerHTML='<div class="empty">'+(opt.empty||'Nothing in this view. Remove a filter to see more.')+'</div>';return;}
+  const col=cols.find(c=>c.k===st.k);let rs=rows;
+  if(col){const g=col.sv||(r=>r[col.k]);rs=[...rows].sort((a,b)=>{const x=g(a),y=g(b);let c;if(typeof x==='string'||typeof y==='string')c=String(x??'').localeCompare(String(y??''));else{const xx=(x==null||isNaN(x))?-Infinity:x,yy=(y==null||isNaN(y))?-Infinity:y;c=xx===yy?0:(xx<yy?-1:1);}return st.dir*c;});}
+  const lim=opt.limit?rs.slice(0,opt.limit):rs;
+  let h='<table><thead><tr>'+cols.map(c=>'<th class="'+(c.n?'n':'')+'" data-k="'+c.k+'" tabindex="0" '+(st.k===c.k?'aria-sort="'+(st.dir<0?'descending':'ascending')+'"':'')+'>'+c.l+'</th>').join('')+'</tr></thead><tbody>';
+  for(const r of lim)h+='<tr>'+cols.map(c=>'<td class="'+(c.n?'n':'')+'">'+(c.f?c.f(r):esc(r[c.k]))+'</td>').join('')+'</tr>';
+  el.innerHTML=h+'</tbody></table>'+(opt.limit&&rs.length>opt.limit?'<div class="empty">Showing the top '+opt.limit+' of '+int(rs.length)+'. Use filters or search to narrow.</div>':'');
+  el.querySelectorAll('th').forEach(th=>{const go2=()=>{const k=th.dataset.k,c=cols.find(x=>x.k===k);if(st.k===k)st.dir*=-1;else{st.k=k;st.dir=c&&c.n?-1:1;}table(id,cols,rows,opt);};th.onclick=go2;th.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go2();}};});}
+const lnk=(k,n)=>'<a href="#" class="flink" data-fk="'+k+'" data-fv="'+esc(n)+'">'+esc(n)+'</a>';
+function mix(c,tot){if(tot<=0)return '<div class="mix"></div>';return '<div class="mix" title="'+CATS.map((x,i)=>x+' '+pc(Math.max(0,c[i])/tot)).join(', ')+'">'+CATS.map((x,i)=>c[i]>0?'<i style="width:'+(c[i]/tot*100).toFixed(1)+'%;background:'+CC[x]+'"></i>':'').join('')+'</div>';}
+function pace(q,b,land){if(!b)return '';const mx=Math.max(b,land,q)*1.02,col=land>b?'var(--red)':land>0.92*b?'var(--orange)':'var(--green)';return '<div class="bar" title="Spent '+$f(q)+', landing '+$f(land)+', budget '+$f(b)+'"><i style="width:'+(Math.max(0,land)/mx*100).toFixed(1)+'%;background:'+col+';opacity:.25"></i><i style="width:'+(Math.max(0,q)/mx*100).toFixed(1)+'%;background:'+col+'"></i><b style="left:'+(b/mx*100).toFixed(1)+'%"></b></div>';}
+function legend(id,names,cols){const el=document.getElementById(id);if(el)el.innerHTML=names.map((n,i)=>'<span><i style="background:'+cols[i]+'"></i>'+esc(n)+'</span>').join('');}
+const stat=(k,v,d,c)=>'<div class="kpi" style="--c:'+(c||'var(--brand)')+'"><div class="k">'+k+'</div><div class="v">'+v+'</div><div class="d">'+d+'</div></div>';
+
+// ---------- pages ----------
+const PG={messages:['Messages','Send a Slack message to leaders and managers who need attention. Each person receives figures from their own dashboard view.'],overview:['Overview','Budget health, the TA-informed forecast and what needs attention.'],insights:['Insights','Every pattern the rules found in the current view, ranked by impact.'],leaders:['Leaders','Scorecard, reporting lines and category mix for each leader.'],people:['Employees','Who spends, how much and on what.'],cats:['Categories','What the money goes on, month by month and why.'],travel:['Travel','Flights, hotels, routes, booking discipline and vendors.'],ta:['Travel approvals & commit','What approved travel means for the rest of the quarter, without double counting airfare.'],controls:['Policy & controls','Policy exceptions, the approval backlog and data gaps.'],policy:['Policy limits','The travel and expense limits applied in this dashboard.']};
+let cur='overview';const dirty=new Set(Object.keys(PG));
+document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>go(b.dataset.p));
+function go(p){cur=p;document.querySelectorAll('#tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.p===p));document.querySelectorAll('.page').forEach(s=>s.classList.toggle('on',s.id==='p-'+p));
+  document.getElementById('title').textContent=PG[p][0];document.getElementById('subtitle').textContent=PG[p][1];document.getElementById('fbar').style.display=(p==='policy'||p==='messages')?'none':'';
+  if(dirty.has(p)){R[p]();dirty.delete(p);}else{document.querySelectorAll('#p-'+p+' .chart').forEach(c=>drawChart(c.id));}}
+function refresh(){IDX=[];for(let i=0;i<N;i++)if(pass(i))IDX.push(i);TIX=[];for(let j=0;j<NT;j++)if(passTA(j))TIX.push(j);INS=null;renderScope();Object.keys(PG).forEach(p=>dirty.add(p));R[cur]();dirty.delete(cur);
+  let s=0;for(const i of IDX)if(TX.f[i]&&TX.a[i]>0)s+=TX.a[i];document.getElementById('flagBadge').textContent=$k(s);}
+
+// ===== OVERVIEW =====
+function rOverview(){
+  const ix=IDX,fc=forecast(ix,TIX),sb=scopeBudget(ix),el=(LC+1)/QD,b=sb.b,v=b!=null?fc.land-b:null,used=b?fc.qtd/b:null;
+  let na=0,ns=0;const NS=DI.s.indexOf('Not Submitted');for(const i of ix){if(NOTAPP.has(TX.s[i]))na+=TX.a[i];if(TX.s[i]===NS)ns+=TX.a[i];}
+  const openC=fc.mode==='ta'?fc.openNon+fc.openAir:null;
+  const bnote=sb.mode==='slice'?'Hidden for a category, purpose or status slice':sb.mode==='prorated'?'Pro-rated to this part of the org':sb.mode==='leaderfile'?'Your share of each budget line':int(sb.lines.length)+' budget lines';
+  document.getElementById('kpis').innerHTML=
+    stat('Spend to date',$k(fc.qtd),int(ix.length)+' lines, '+int(new Set(ix.map(i=>TX.e[i])).size)+' people','var(--brand)')+
+    stat('Q3 budget',b!=null?$k(b):'–',bnote,'var(--navy)')+
+    '<div class="kpi" style="--c:'+(used>el?'var(--red)':'var(--green)')+'"><div class="k">Budget used</div><div class="v '+(used>el+0.05?'red':used>el?'amber':'')+'">'+(used!=null?pc(used):'–')+'</div><div class="meter"><i style="width:'+Math.min(100,(used||0)*100).toFixed(1)+'%;background:'+(used>el?'var(--red)':'var(--green)')+'"></i><b style="left:'+(el*100).toFixed(1)+'%" title="Share of quarter elapsed"></b></div><div class="d">'+pc(el)+' of the quarter gone</div></div>'+
+    stat('Open TA commit',openC!=null?$k(openC):'–',openC!=null?'Approved trips not yet in spend':'Not shown for this slice','var(--purple)')+
+    stat('Projected landing',$k(fc.land),fc.mode==='ta'?'TA-informed. Run-rate view: '+$k(fc.rrLand):'Run-rate view','var(--purple-2)')+
+    '<div class="kpi" style="--c:'+(v>0?'var(--red)':'var(--green)')+'"><div class="k">Projected vs budget</div><div class="v '+(v==null?'':v>0?'red':'green')+'">'+(v==null?'–':signed(v))+'</div><div class="d">'+(v==null?'Needs a whole-spend view':(v>0?'Over by ':'Under by ')+pc(Math.abs(v)/b,1))+'</div></div>'+
+    stat('Not yet approved',$k(na),pc(fc.qtd?na/fc.qtd:0)+' of spend, '+$k(ns)+' never submitted','var(--orange)');
+  // insights top
+  const ins=insights();document.getElementById('insTop').innerHTML=ins.slice(0,6).map(insHTML).join('')||'<div class="empty">No notable patterns in this view.</div>';
+  // burn
+  const daily=new Float64Array(QD);for(const i of ix)daily[TX.d[i]]+=TX.a[i];const path=dailyPath(ix,TIX,fc);
+  const lab=[],act=[],proj=[],paceL=[];let c=0;for(let d=0;d<=LC;d++)c+=daily[d];const tail=fc.qtd-c;let run=0,pr=c;
+  for(let d=0;d<QD;d++){lab.push(dL(d));run+=d<=LC?daily[d]:0;act.push(d<=LC?run:null);if(d<LC)proj.push(null);else if(d===LC)proj.push(c);else{pr+=path[d]+(d-LC<=4?tail/4:0);proj.push(pr);}if(b!=null)paceL.push(b*(d+1)/QD);}
+  const ser=[{name:'Actual cumulative',data:act,color:'#0176D3',kind:'line',fill:true,width:2.5},{name:'Projected',data:proj,color:'#9050E9',kind:'line',dash:'6 5',width:2.5}];
+  if(b!=null)ser.push({name:'Even budget pace',data:paceL,color:'#9A9A9A',kind:'line',dash:'2 3',width:1.3});
+  chart('cBurn',{type:'line',labels:lab,series:ser,fmt:$k,hline:b!=null?[{v:b,c:'#BA0517',label:'Budget '+$k(b)}]:[],vline:{i:LC,label:'Data to '+dL(LC)},title:i=>dL(i)+', 2026',xEvery:14});
+  document.getElementById('burnSub').textContent='Actual to '+dL(LC)+', then '+(fc.mode==='ta'?'the TA-informed projection':'the run-rate')+' to '+dL(QD-1)+'. Lands at '+$k(fc.land)+(v!=null?', '+(v>0?$k(v)+' over':$k(-v)+' under')+' budget.':'.');
+  // waterfall
+  const items=[{label:'Spend to date',v:fc.qtd,kind:'total',color:'#0176D3'}];
+  if(fc.mode==='ta'){items.push({label:'Day-to-day spend',v:fc.base,kind:'delta',color:'#8E9CAD',note:'Spend not tied to an approved trip, at its current daily rate'},{label:'Approved trips still to come',v:fc.openNon,kind:'delta',color:'#7526E3',note:'Hotel, rail and other costs for approved trip days after '+dL(LC)},{label:'Trips not yet approved',v:fc.unr,kind:'delta',color:'#B490F0',note:'Expected from how far ahead approvals are usually raised'},{label:'Airfare still to book',v:fc.airF,kind:'delta',color:'#1B96FF',note:'Bookings at the current airfare rate, including '+$k(fc.openAir)+' approved but not yet booked'});}
+  else items.push({label:'Run-rate to '+dL(QD-1),v:fc.land-fc.qtd,kind:'delta',color:'#9050E9'});
+  items.push({label:'Projected landing',v:fc.land,kind:'total',color:v>0?'#BA0517':'#2E844A'});
+  chart('cWater',{type:'waterfall',labels:items.map(x=>x.label),items,fmt:$k,hline:b!=null?[{v:b,c:'#032D60',label:'Budget'}]:[]});
+  document.getElementById('howForecast').innerHTML=fc.mode==='ta'?'Airfare is expensed when it is booked, while hotels, meals and taxis are expensed on the travel dates. So the forecast never adds the approved airfare on top of spend to date. Airfare on approvals raised before Aug 1 was booked last quarter and is excluded. Hotel and other trip costs are added only for approved travel days after '+dL(LC)+'. Trips not yet approved are estimated from the share of trip cost usually approved that far ahead (only '+pc(cov(28))+' is approved four weeks out). Day-to-day spend excludes lines that fall inside an approved trip, so nothing is counted twice. One-off Dreamforce and kickoff spend is left out of every rate. The straight run-rate view is '+$k(fc.rrLand)+'.':'A category, purpose or status filter is on, so the forecast uses the straight run-rate for that slice.';
+  // weekly
+  const wk=Array.from({length:NW},(_,i)=>i+1);const W=CATS.map(()=>new Float64Array(NW+1));for(const i of ix)W[CI[i]][WK[i]]+=TX.a[i];
+  const ws=CATS.map((c,ci)=>({name:c,data:wk.map(w=>w<=LASTW?W[ci][w]:null),color:CC[c],kind:'bar',stack:'a'}));
+  const pw=new Float64Array(NW+1);for(let d=LC+1;d<QD;d++)pw[weekOf(d)]+=path[d];
+  ws.push({name:'Projected',data:wk.map(w=>w>LCW&&pw[w]>0?pw[w]:null),color:'#9050E9',kind:'bar',stack:'a',ghost:true});
+  legend('lgWeekly',[...CATS,'Projected'],[...CATS.map(c=>CC[c]),'#C6A9F5']);
+  chart('cWeekly',{type:'bar',labels:wk.map(wL),series:ws,fmt:$k,title:i=>wL(i+1)+', '+wR(i+1)});
+  // regions
+  let rh='';for(let r=0;r<DI.ou.length;r++){if(F.ou>=0&&F.ou!==r)continue;const ri=ix.filter(i=>TX.ou[i]===r);if(!ri.length)continue;const rt=TIX.filter(j=>TA.ou[j]===r);const f2=forecast(ri,rt);
+    const rb=sb.b!=null?sb.lines.filter(l=>l.oui===r).reduce((s,l)=>s+l.b,0):null;const [cl,tx]=status(f2.land,rb,f2.qtd);
+    rh+='<div style="padding:10px 0 12px;border-bottom:1px solid var(--line-2)"><div style="display:flex;justify-content:space-between;align-items:center"><b style="font-size:15px">'+DI.ou[r]+'</b><span class="bdg '+cl+'">'+tx+'</span></div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:8px 0">'+mini('Spend',$k(f2.qtd))+mini('Budget',rb!=null?$k(rb):'–')+mini('Landing',$k(f2.land))+mini('vs budget',rb?'<span style="color:'+(f2.land>rb?'var(--red)':'var(--green)')+'">'+signed(f2.land-rb)+'</span>':'–')+'</div>'+pace(f2.qtd,rb,f2.land)+'</div>';}
+  let cu=0,ev=0;for(const i of ix){if(TX.cu[i])cu+=TX.a[i];if(EVENTS.has(TX.p[i]))ev+=TX.a[i];}
+  document.getElementById('regions').innerHTML=(rh||'<div class="empty">No spend in view.</div>')+'<p class="foot" style="padding:10px 0 0">Customer-facing spend is '+pc(fc.qtd?cu/fc.qtd:0)+' of the total. One-off event spend (Dreamforce, kickoff) is '+$k(ev)+'.</p>';
+  function mini(k,v){return '<div><div style="font-size:11.5px;color:var(--text-3)">'+k+'</div><div class="num" style="font-weight:700;font-size:15px">'+v+'</div></div>';}
+  // owners
+  const rows=[];if(sb.mode!=='slice'){for(const l of sb.lines){const tl=taFor(l.oui,l.owi);const f3=forecast(l.rows,tl);const [cl,tx]=status(f3.land,l.b,f3.qtd);rows.push({n:l.n,ou:l.ou,b:l.b,q:f3.qtd,u:l.b?f3.qtd/l.b:null,open:f3.openNon+f3.openAir,land:f3.land,v:f3.land-l.b,cl,tx});}
+    const nb=ix.filter(i=>TX.ow[i]===NOBUD);if(nb.length&&F.ow<0)grp(nb,i=>TX.ou[i]).forEach(g=>{const f3=forecast(g.rows,TIX.filter(j=>TA.ow[j]===NOBUD&&TA.ou[j]===g.k));rows.push({n:'No budget line',ou:DI.ou[g.k],b:0,q:f3.qtd,u:null,open:f3.openNon+f3.openAir,land:f3.land,v:null,cl:'na',tx:'No budget'});});}
+  document.getElementById('ownSub').textContent=sb.mode==='slice'?'Budget comparison is hidden while a category, purpose or status filter is on.':'Each line is charged to the person\'s own budget if they hold one, otherwise to the nearest leader above them whose budget covers their team (the Leader column). Arun, Mankiran, Paul and Arundhati\'s budgets cover only their own spend.'+(sb.mode==='prorated'?' Budgets are pro-rated to the share of each owner\'s spend inside this filter.':'');
+  table('tOwners',[{k:'n',l:'Budget owner',f:r=>r.n==='No budget line'?'<span class="nm">No budget line</span><span class="mt">Reporting line has no budget holder in this region</span>':'<span class="nm">'+esc(r.n)+'</span>'},{k:'ou',l:'Region'},{k:'b',l:'Budget',n:1,f:r=>r.b?$f(r.b):'–'},{k:'q',l:'Spend to date',n:1,f:r=>$f(r.q)},{k:'u',l:'Used',n:1,f:r=>pc(r.u)},{k:'open',l:'Open TA commit',n:1,f:r=>r.open?$f(r.open):'–'},{k:'land',l:'Projected landing',n:1,f:r=>$f(r.land)},{k:'v',l:'vs budget',n:1,f:r=>r.v==null?'–':'<b style="color:'+(r.v>0?'var(--red)':'var(--green)')+'">'+signed(r.v)+'</b>'},{k:'pc',l:'Pace',sv:r=>r.b?r.land/r.b:-1,f:r=>pace(r.q,r.b,r.land)},{k:'tx',l:'Status',sv:r=>({over:3,watch:2,ok:1,na:0})[r.cl]+(r.b?r.land/r.b/100:0),f:r=>'<span class="bdg '+r.cl+'">'+r.tx+'</span>'}],rows,{sort:'v',empty:'Budget comparison is hidden for this slice.'});
+}
+
+// ===== LEADERS =====
+let open=new Set();
+function rLeaders(){
+  const ix=IDX,L=[...grp(ix,i=>TX.ld[i]).values()].sort((a,b)=>b.a-a.a);const tot=sum(ix);
+  // scorecard
+  const sb=scopeBudget(ix);
+  const S=L.map(g=>{const tl=TIX.filter(j=>TA.ld[j]===g.k);const f=forecast(g.rows,tl);let cu=0,fl=0,na=0,trav=0,noTa=0;const taE=new Set(tl.map(j=>TA.e[j]));const emps=new Set();
+    for(const i of g.rows){const a=TX.a[i];emps.add(TX.e[i]);if(TX.cu[i])cu+=a;if(TX.f[i]&&a>0)fl+=a;if(NOTAPP.has(TX.s[i]))na+=a;if(TRAVX.has(TX.x[i])&&a>0){trav+=a;if(!taE.has(TX.e[i]))noTa+=a;}}
+    // budget for this leader = owners whose rows sit under this leader, pro-rated
+    let lb=0;if(sb.mode!=='slice'){const own=grp(g.rows,i=>TX.ou[i]+'|'+TX.ow[i]);own.forEach((o,k)=>{const bl=BUD.find(b=>(b.oui+'|'+b.owi)===k);if(bl){const full=ownFull.get(k)||0;lb+=bl.b*(full>0?Math.max(0,Math.min(1,o.a/full)):1);}});}
+    return {n:DI.ld[g.k],a:g.a,emps:emps.size,per:g.a/Math.max(1,emps.size),b:lb||null,land:f.land,v:lb?f.land-lb:null,vr:lb?(f.land-lb)/lb:null,cu:g.a>0?cu/g.a:0,fl:g.a>0?fl/g.a:0,na:g.a>0?na/g.a:0,noTa:trav>0?noTa/trav:0,open:(f.openNon||0)+(f.openAir||0)};});
+  const dot=(v,good,bad,inv)=>{if(v==null)return '';const g=inv?v>=good:v<=good,b=inv?v<bad:v>bad;const c=b?['var(--red-lt)','var(--red)']:g?['var(--green-lt)','var(--green)']:['var(--amber-bg)','var(--amber)'];return '<span title="'+(b?'Needs attention':g?'Good':'Watch')+'" style="display:inline-block;width:9px;height:9px;border-radius:50%;background:'+c[1]+';margin-left:6px;vertical-align:middle"></span>';};
+  table('tScore',[{k:'n',l:'Leader',f:r=>lnk('ld',r.n)},{k:'a',l:'Spend',n:1,f:r=>$f(r.a)},{k:'emps',l:'People',n:1},{k:'per',l:'Per person',n:1,f:r=>$f(r.per)},{k:'b',l:'Budget',n:1,f:r=>r.b?$f(r.b):'–'},{k:'land',l:'Landing',n:1,f:r=>$f(r.land)},{k:'vr',l:'vs budget',n:1,f:r=>r.v==null?'–':'<b style="color:'+(r.v>0?'var(--red)':'var(--green)')+'">'+signed(r.v)+'</b> '+dot(r.vr,0,0.05)},{k:'cu',l:'Customer-facing',n:1,f:r=>pc(r.cu)+' '+dot(r.cu,0.5,0.35,true)},{k:'fl',l:'Exception rate',n:1,f:r=>pc(r.fl)+' '+dot(r.fl,0.15,0.3)},{k:'na',l:'Not approved',n:1,f:r=>pc(r.na)+' '+dot(r.na,0.3,0.5)},{k:'noTa',l:'Travel without TA',n:1,f:r=>pc(r.noTa)+' '+dot(r.noTa,0.05,0.15)},{k:'open',l:'Open TA commit',n:1,f:r=>r.open?$f(r.open):'–'}],S,{sort:'a'});
+  const top=L.slice(0,15);legend('lgLead',CATS,CATS.map(c=>CC[c]));
+  chart('cLeaders',{type:'hbar',labels:top.map(g=>DI.ld[g.k]),series:CATS.map((c,ci)=>({name:c,color:CC[c],data:top.map(g=>{let s=0;for(const i of g.rows)if(CI[i]===ci)s+=TX.a[i];return s;})})),fmt:$k,tipFn:i=>tipRows(DI.ld[top[i].k]+', '+$f(top[i].a),CATS.map((c,ci)=>{let s=0;for(const r of top[i].rows)if(CI[r]===ci)s+=TX.a[r];return {n:c,c:CC[c],v:$f(s)};}))});
+  const t5=L.slice(0,5),pal=['#0176D3','#06A59A','#FE9339','#9050E9','#D83A86'];legend('lgLT',t5.map(g=>DI.ld[g.k]),pal);
+  chart('cLeadTrend',{type:'line',labels:Array.from({length:LCW},(_,i)=>wL(i+1)),series:t5.map((g,j)=>{const a=new Float64Array(LASTW+1);for(const i of g.rows)a[WK[i]]+=TX.a[i];return {name:DI.ld[g.k],data:Array.from(a).slice(1,LCW+1),color:pal[j],kind:'line',points:true};}),fmt:$k,title:i=>wL(i+1)+', '+wR(i+1)});
+  // tree
+  let h='<table><thead><tr><th>Name</th><th class="n">Spend</th><th class="n">Share</th><th class="n">People</th><th class="n">Per person</th><th class="n">Lines</th><th class="n">Customer-facing</th><th class="n">Flagged</th><th class="n">Not approved</th><th>Category mix</th></tr></thead><tbody>';
+  const row=(g,lvl,key,name,kids)=>{const o=open.has(key),em=new Set();let cu=0,fl=0,na=0;for(const i of g.rows){em.add(TX.e[i]);if(TX.cu[i])cu+=TX.a[i];if(TX.f[i]&&TX.a[i]>0)fl+=TX.a[i];if(NOTAPP.has(TX.s[i]))na+=TX.a[i];}const c=catSums(g.rows);
+    return '<tr class="l'+lvl+'"><td>'+(kids?'<button class="tog" data-key="'+esc(key)+'" aria-expanded="'+o+'" aria-label="'+(o?'Collapse ':'Expand ')+esc(name)+'">'+(o?'▾':'▸')+'</button>':'<span class="tog"></span>')+esc(name)+'</td><td class="n">'+$f(g.a)+'</td><td class="n">'+pc(tot?g.a/tot:0,1)+'</td><td class="n">'+em.size+'</td><td class="n">'+$f(g.a/Math.max(1,em.size))+'</td><td class="n">'+int(g.n)+'</td><td class="n">'+pc(g.a>0?cu/g.a:0)+'</td><td class="n">'+(fl>0?'<span style="color:var(--red)">'+$k(fl)+'</span>':'–')+'</td><td class="n">'+$k(na)+'</td><td>'+mix(c,Math.max(0,[...c].reduce((a,b)=>a+Math.max(0,b),0)))+'</td></tr>';};
+  for(const g of L){const k0='L'+g.k,k1s=[...grp(g.rows,i=>TX.l1[i]).values()].sort((a,b)=>b.a-a.a);h+=row(g,0,k0,DI.ld[g.k],k1s.length>0);
+    if(open.has(k0))for(const g1 of k1s){const k1=k0+'/'+g1.k,k2s=[...grp(g1.rows,i=>TX.l2[i]).values()].sort((a,b)=>b.a-a.a);h+=row(g1,1,k1,DI.l1[g1.k],k2s.length>0);if(open.has(k1))for(const g2 of k2s)h+=row(g2,2,k1+'/'+g2.k,DI.l2[g2.k],false);}}
+  const te=document.getElementById('tTree');te.innerHTML=L.length?h+'</tbody></table>':'<div class="empty">Nothing in this view.</div>';
+  te.querySelectorAll('.tog[data-key]').forEach(b=>b.onclick=()=>{const k=b.dataset.key;open.has(k)?open.delete(k):open.add(k);rLeaders();});
+  const ea=document.getElementById('expandAll');ea.textContent=open.size?'Collapse all':'Expand all';ea.onclick=()=>{if(open.size)open.clear();else for(const g of L){open.add('L'+g.k);grp(g.rows,i=>TX.l1[i]).forEach(g1=>open.add('L'+g.k+'/'+g1.k));}rLeaders();};
+  let hh='<table class="heat"><thead><tr><th>Leader</th>'+CATS.map(c=>'<th class="n">'+c+'</th>').join('')+'<th class="n">Total</th></tr></thead><tbody>';
+  for(const g of L){const c=catSums(g.rows);hh+='<tr><td class="nm">'+esc(DI.ld[g.k])+'</td>'+[...c].map(v=>{const s=g.a>0?Math.max(0,v)/g.a:0;return '<td class="h" style="background:rgba(1,118,211,'+(s*0.9).toFixed(3)+');color:'+(s>0.42?'#fff':'inherit')+'" title="'+pc(s)+' of this leader\'s spend">'+$k(v)+'</td>';}).join('')+'<td class="h"><b>'+$k(g.a)+'</b></td></tr>';}
+  document.getElementById('tHeat').innerHTML=L.length?hh+'</tbody></table>':'<div class="empty">Nothing in this view.</div>';
+}
+
+// ===== PEOPLE =====
+function empAgg(ix){const m=new Map();for(const i of ix){const e=TX.e[i];let o=m.get(e);if(!o){o={e,a:0,n:0,c:new Float64Array(6),trv:new Set(),cu:0,na:0,fl:0,fn:0,ld:new Map(),l1:new Map(),ou:TX.ou[i]};m.set(e,o);}const a=TX.a[i];o.a+=a;o.n++;o.c[CI[i]]+=a;if(TRAVX.has(TX.x[i]))o.trv.add(WK[i]);if(TX.cu[i])o.cu+=a;if(NOTAPP.has(TX.s[i]))o.na+=a;if(TX.f[i]&&a>0){o.fl+=a;o.fn++;}o.ld.set(TX.ld[i],(o.ld.get(TX.ld[i])||0)+1);o.l1.set(TX.l1[i],(o.l1.get(TX.l1[i])||0)+1);}
+  const top=mp=>{let b=-1,bc=-1;mp.forEach((c,k)=>{if(c>bc){bc=c;b=k;}});return b;};
+  return [...m.values()].map(o=>({...o,name:DI.e[o.e],ldn:DI.ld[top(o.ld)],l1n:DI.l1[top(o.l1)],l1i:top(o.l1),topc:CATS[[...o.c].indexOf(Math.max(...o.c))]}));}
+function rPeople(){
+  const E=empAgg(IDX).sort((a,b)=>b.a-a.a),tot=E.reduce((s,e)=>s+e.a,0),n=E.length;const pos=E.filter(e=>e.a>0);const med=pos.length?pos[Math.floor(pos.length/2)].a:0;const t10=Math.max(1,Math.round(n*0.1));const t10s=E.slice(0,t10).reduce((s,e)=>s+e.a,0);
+  document.getElementById('pStats').innerHTML=stat('People with spend',int(n),E.filter(e=>e.trv.size).length+' with travel spend')+stat('Average per person',$k(n?tot/n:0),'Median '+$k(med),'var(--teal)')+stat('Top 10% of spenders',pc(tot?t10s/tot:0),'of spend, '+t10+' people','var(--purple)')+stat('Largest individual',E[0]?$k(E[0].a):'–',E[0]?esc(E[0].name):'','var(--orange)');
+  let c=0;const pts=E.map((e,i)=>{c+=e.a;return {x:(i+1)/Math.max(1,n)*100,y:tot?c/tot*100:0};});
+  chart('cPareto',{type:'line',xNumeric:true,xMin:0,xMax:100,labels:pts.map(()=> ''),series:[{name:'Share of spend',data:pts,color:'#0176D3',kind:'line',fill:true},{name:'Even split',data:[{x:0,y:0},{x:100,y:100}],color:'#B0ADAB',kind:'line',dash:'3 3',width:1,noTip:true}],fmt:v=>Math.round(v)+'%',xfmt:v=>v+'%',yMax:100,xTitle:'Share of people, ranked by spend',tipFn:i=>'<b>Top '+pts[i].x.toFixed(0)+'% of people</b><div>hold '+pts[i].y.toFixed(0)+'% of spend</div>'});
+  const B=[[-Infinity,0,'Credit or zero'],[0,500,'Under $500'],[500,1000,'$500 to 1K'],[1000,2500,'$1K to 2.5K'],[2500,5000,'$2.5K to 5K'],[5000,10000,'$5K to 10K'],[10000,Infinity,'$10K+']];
+  chart('cBands',{type:'bar',labels:B.map(b=>b[2]),series:[{name:'People',data:B.map(b=>E.filter(e=>e.a>b[0]&&e.a<=b[1]).length),color:'#06A59A'}],fmt:v=>int(v)});
+  const q=(document.getElementById('empSearch').value||'').toLowerCase();const rank=new Map(E.map((e,i)=>[e.e,i+1]));
+  const rows=E.filter(e=>!q||e.name.toLowerCase().includes(q)).map(e=>({...e,rank:rank.get(e.e),cp:e.a>0?e.cu/e.a:0,avg:e.a/e.n,tw:e.trv.size}));
+  table('tEmp',[{k:'rank',l:'Rank',n:1},{k:'name',l:'Employee',f:r=>lnk('e',r.name)+'<span class="mt">'+lineOf(r.ldn,r.l1n)+'</span>'},{k:'ou',l:'Region',sv:r=>DI.ou[r.ou],f:r=>DI.ou[r.ou]},{k:'a',l:'Spend',n:1,f:r=>'<b>'+$f(r.a)+'</b>'},{k:'n',l:'Lines',n:1},{k:'avg',l:'Per line',n:1,f:r=>$f(r.avg)},{k:'tw',l:'Travel weeks',n:1},{k:'cp',l:'Customer-facing',n:1,f:r=>pc(r.cp)},{k:'na',l:'Not approved',n:1,f:r=>r.na?$f(r.na):'–'},{k:'fl',l:'Flagged',n:1,f:r=>r.fl>0?'<span style="color:var(--red)">'+$f(r.fl)+'</span> <span class="mt" style="display:inline">('+r.fn+')</span>':'–'},{k:'mx',l:'Category mix',sv:r=>r.topc,f:r=>mix(r.c,Math.max(0,[...r.c].reduce((a,b)=>a+Math.max(0,b),0)))+'<span class="mt">Mostly '+esc(r.topc.toLowerCase())+'</span>'}],rows,{sort:'a',limit:250});
+}
+document.getElementById('empSearch').addEventListener('input',()=>{clearTimeout(qT);qT=setTimeout(rPeople,200);});
+
+// ===== CATEGORIES =====
+function rCats(){
+  const ix=IDX,tot=sum(ix),cs=catSums(ix);
+  chart('cCat',{type:'donut',labels:CATS,series:[{data:[...cs],colors:CATS.map(c=>CC[c])}],fmt:$k});
+  const W=CATS.map(()=>new Float64Array(LASTW+1));for(const i of ix)W[CI[i]][WK[i]]+=TX.a[i];legend('lgCT',CATS,CATS.map(c=>CC[c]));
+  chart('cCatTrend',{type:'line',labels:Array.from({length:LCW},(_,i)=>wL(i+1)),series:CATS.map((c,ci)=>({name:c,data:Array.from(W[ci]).slice(1,LCW+1),color:CC[c],kind:'line',points:true})),fmt:$k,title:i=>wL(i+1)+', '+wR(i+1)});
+  // month on month (Aug d0-30, Sep d31-60, Oct forecast run-rate share by category)
+  const mA=new Float64Array(6),mS=new Float64Array(6),rr=new Float64Array(6);for(const i of ix){const d=TX.d[i];if(d<=30)mA[CI[i]]+=TX.a[i];else if(d<=60)mS[CI[i]]+=TX.a[i];if(d<=LC&&!EVENTS.has(TX.p[i]))rr[CI[i]]+=TX.a[i];}
+  const mrows=CATS.map((c,ci)=>({c,aug:mA[ci],sep:mS[ci],oct:rr[ci]/(LC+1)*31,ch:mA[ci]?(mS[ci]-mA[ci])/Math.abs(mA[ci]):null}));mrows.push({c:'Total',aug:[...mA].reduce((a,b)=>a+b,0),sep:[...mS].reduce((a,b)=>a+b,0),oct:[...rr].reduce((a,b)=>a+b,0)/(LC+1)*31,tot:1});mrows[mrows.length-1].ch=(mrows[mrows.length-1].sep-mrows[mrows.length-1].aug)/Math.abs(mrows[mrows.length-1].aug||1);
+  table('tMonth',[{k:'c',l:'Category',f:r=>r.tot?'<b>Total</b>':'<span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:'+CC[r.c]+';margin-right:7px"></span>'+esc(r.c)},{k:'aug',l:'August',n:1,f:r=>$f(r.aug)},{k:'sep',l:'September',n:1,f:r=>$f(r.sep)},{k:'ch',l:'Change',n:1,f:r=>r.ch==null?'–':'<span style="color:'+(r.ch>0.1?'var(--red)':r.ch<-0.1?'var(--green)':'inherit')+'">'+(r.ch>0?'+':'')+pc(r.ch)+'</span>'},{k:'oct',l:'October at current pace',n:1,f:r=>$f(r.oct)}],mrows,{sort:null});
+  const pg=[...grp(ix,i=>TX.p[i]).values()].sort((a,b)=>b.a-a.a);
+  chart('cPurp',{type:'hbar',labels:pg.map(g=>DI.p[g.k]),series:[{name:'Spend',data:pg.map(g=>g.a),color:'#0176D3'}],colorAt:(x,i)=>{const n=DI.p[pg[i].k];return n==='Customer-facing travel'?'#2E844A':n==='Purpose not set'?'#BA0517':EVENTS.has(pg[i].k)?'#9050E9':n==='Internal business travel'?'#DD7A01':'#8E9CAD';},fmt:$k});
+  const un=pg.find(g=>DI.p[g.k]==='Purpose not set');document.getElementById('purpSub').textContent=un?pc(tot?un.a/tot:0)+' of spend ('+$k(un.a)+') has no report purpose yet, mostly recent lines not yet on a report.':'All spend in view has a report purpose.';
+  const L=[...grp(ix,i=>TX.ld[i]).values()].filter(g=>g.a>2000).sort((a,b)=>b.a-a.a).slice(0,15).map(g=>{let c=0;for(const i of g.rows)if(TX.cu[i])c+=TX.a[i];return {n:DI.ld[g.k],p:c/g.a,a:g.a};}).sort((a,b)=>b.p-a.p);
+  chart('cCust',{type:'hbar',labels:L.map(l=>l.n),series:[{name:'Customer-facing',data:L.map(l=>l.p*100),color:'#2E844A'}],colorAt:(x,i)=>L[i].p>=0.5?'#2E844A':L[i].p>=0.35?'#DD7A01':'#BA0517',fmt:v=>Math.round(v)+'%',xMax:100,vlines:[{v:50,c:'#032D60'}],tipFn:i=>'<b>'+esc(L[i].n)+'</b><div>'+pc(L[i].p)+' customer-facing of '+$f(L[i].a)+'</div>'});
+  const dow=new Float64Array(7),dn=new Float64Array(7);for(let d=0;d<=LC;d++)dn[dDate(d).getDay()]++;for(const i of ix)if(TX.d[i]<=LC)dow[dDate(TX.d[i]).getDay()]+=TX.a[i];
+  const DN=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];const ord=[1,2,3,4,5,6,0];
+  chart('cDow',{type:'bar',labels:ord.map(d=>DN[d]),series:[{name:'Average a day',data:ord.map(d=>dn[d]?dow[d]/dn[d]:0),color:'#0176D3'}],colorAt:(x,i)=>ord[i]===0||ord[i]===6?'#8E9CAD':'#0176D3',fmt:$k});
+  const X=[...grp(ix,i=>TX.x[i]).values()].map(g=>{let w1=0,w0=0,at=0,atA=0;for(const i of g.rows){if(!EVENTS.has(TX.p[i])){if(WK[i]===LCW)w1+=TX.a[i];if(WK[i]===LCW-1)w0+=TX.a[i];}if(TX.att[i]>0){at+=TX.att[i];atA+=TX.a[i];}}return {n:DI.x[g.k],cat:M.x2cat[DI.x[g.k]],a:g.a,ln:g.n,avg:g.a/g.n,sh:tot?g.a/tot:0,ch:w0?(w1-w0)/Math.abs(w0):null,w1,ph:at?atA/at:null,em:new Set(g.rows.map(i=>TX.e[i])).size};});
+  table('tTypes',[{k:'n',l:'Expense type',f:r=>'<span class="nm">'+esc(r.n)+'</span><span class="mt">'+esc(r.cat)+'</span>'},{k:'a',l:'Spend',n:1,f:r=>$f(r.a)},{k:'sh',l:'Share',n:1,f:r=>pc(r.sh,1)},{k:'ln',l:'Lines',n:1,f:r=>int(r.ln)},{k:'em',l:'People',n:1},{k:'avg',l:'Per line',n:1,f:r=>$f(r.avg)},{k:'ph',l:'Per attendee',n:1,f:r=>r.ph==null?'–':$f(r.ph)},{k:'w1',l:wL(LCW),n:1,f:r=>$f(r.w1)},{k:'ch',l:'Week change',n:1,f:r=>r.ch==null?'–':'<span style="color:'+(r.ch>0.1?'var(--red)':r.ch<-0.1?'var(--green)':'inherit')+'">'+(r.ch>0?'+':'')+pc(r.ch)+'</span>'}],X,{sort:'a'});
+}
+
+// ===== TRAVEL =====
+function rTravel(){
+  const ix=IDX,air=ix.filter(i=>TX.x[i]===AIRX),ap=air.filter(i=>TX.a[i]>0),as=sum(air);const prem=ap.filter(i=>['Business','First'].includes(DI.fc[TX.fc[i]]));const intl=ap.filter(i=>DI.sc[TX.sc[i]]==='International');const wa=ap.filter(i=>TX.adv[i]!=null&&TX.adv[i]>=0);const avg=wa.length?wa.reduce((s,i)=>s+TX.adv[i],0)/wa.length:null;
+  document.getElementById('aStats').innerHTML=stat('Airfare spend',$k(as),int(ap.length)+' tickets, '+$f(ap.length?sum(ap)/ap.length:0)+' average'+(as<sum(ap)-1?', net of '+$k(sum(ap)-as)+' refunds':''))+stat('International share',pc(sum(ap)?sum(intl)/sum(ap):0),$k(sum(intl))+' on '+intl.length+' tickets','var(--purple)')+stat('Business or first class',$k(sum(prem)),prem.length+' tickets','var(--red)')+stat('Average booking lead time',avg==null?'–':avg.toFixed(0)+' days',pc(wa.length?wa.filter(i=>TX.adv[i]<=3).length/wa.length:0)+' booked 3 days or less ahead','var(--orange)');
+  const B=[[0,3,'0 to 3 days'],[4,7,'4 to 7'],[8,14,'8 to 14'],[15,21,'15 to 21'],[22,9999,'22+ days']];const bc=B.map(b=>wa.filter(i=>TX.adv[i]>=b[0]&&TX.adv[i]<=b[1]));
+  chart('cAdv',{type:'bar',labels:B.map(b=>b[2]),series:[{name:'Tickets',data:bc.map(r=>r.length),color:'#1B96FF',kind:'bar'},{name:'Average fare',data:bc.map(r=>r.length?sum(r)/r.length:null),color:'#032D60',kind:'line',axis:'y2',points:true}],colorAt:(x,i)=>i===0?'#BA0517':'#1B96FF',fmt:v=>int(v),fmt2:$k});
+  const SC=['Domestic','Within ASEAN','International','Route not captured'];const scs=SC.map(s=>air.filter(i=>DI.sc[TX.sc[i]]===s));
+  chart('cScope',{type:'bar',labels:SC,series:[{name:'Spend',data:scs.map(sum),color:'#0176D3',kind:'bar'},{name:'Average fare',data:scs.map(r=>{const p=r.filter(i=>TX.a[i]>0);return p.length?sum(p)/p.length:null;}),color:'#FE9339',kind:'line',axis:'y2',points:true}],colorAt:(x,i)=>['#0176D3','#06A59A','#9050E9','#C9C9C9'][i],fmt:$k,fmt2:$k});
+  const Rr=[...grp(air.filter(i=>DI.rt[TX.rt[i]]),i=>TX.rt[i]).values()].map(g=>{const p=g.rows.filter(i=>TX.a[i]>0);return {r:DI.rt[g.k],a:g.a,n:p.length,avg:g.a/Math.max(1,p.length),sc:DI.sc[TX.sc[g.rows[0]]],fl:g.rows.filter(i=>TX.f[i]&1).length};});
+  table('tRoutes',[{k:'r',l:'Route',f:r=>'<span class="nm">'+esc(r.r)+'</span><span class="mt">'+esc(r.sc)+'</span>'},{k:'a',l:'Spend',n:1,f:r=>$f(r.a)},{k:'n',l:'Tickets',n:1},{k:'avg',l:'Average fare',n:1,f:r=>$f(r.avg)},{k:'fl',l:'Over limit',n:1,f:r=>r.fl?'<span style="color:var(--red)">'+r.fl+'</span>':'–'}],Rr,{sort:'a',limit:40});
+  const AV=[...grp(ix.filter(i=>TX.x[i]===AIRX||TX.x[i]===FEEX),i=>TX.v[i]).values()].sort((a,b)=>b.a-a.a).slice(0,12);
+  chart('cAirline',{type:'hbar',labels:AV.map(g=>DI.v[g.k]),series:[{name:'Spend',data:AV.map(g=>g.a),color:'#0176D3'}],fmt:$k});
+  const hot=ix.filter(i=>TX.x[i]===HOTX&&TX.a[i]>0);const HC=[...grp(hot,i=>TX.c[i]).values()].filter(g=>DI.c[g.k]).sort((a,b)=>b.a-a.a).slice(0,12).map(g=>({c:DI.c[g.k],avg:g.a/g.n,a:g.a,n:g.n})).sort((a,b)=>b.avg-a.avg);
+  chart('cHotel',{type:'hbar',labels:HC.map(h=>h.c),series:[{name:'Average night',data:HC.map(h=>h.avg),color:'#06A59A'}],colorAt:(x,i)=>HC[i].avg>300?'#BA0517':'#06A59A',fmt:$k,vlines:[{v:300,c:'#032D60'}],tipFn:i=>'<b>'+esc(HC[i].c)+'</b><div>'+$f(HC[i].avg)+' average across '+HC[i].n+' nights</div><div>'+$f(HC[i].a)+' total</div>'});
+  const V=[...grp(ix.filter(i=>DI.v[TX.v[i]]!=='Not specified'),i=>TX.v[i]).values()].sort((a,b)=>b.a-a.a).slice(0,12);
+  chart('cVendor',{type:'hbar',labels:V.map(g=>DI.v[g.k]),series:[{name:'Spend',data:V.map(g=>g.a),color:'#9050E9'}],fmt:$k});
+  const C=[...grp(ix.filter(i=>DI.c[TX.c[i]]),i=>TX.c[i]).values()].sort((a,b)=>b.a-a.a).slice(0,15);legend('lgCity',CATS,CATS.map(c=>CC[c]));
+  chart('cCity',{type:'bar',labels:C.map(g=>DI.c[g.k]),series:CATS.map((c,ci)=>({name:c,color:CC[c],kind:'bar',stack:'a',data:C.map(g=>{let s=0;for(const i of g.rows)if(CI[i]===ci)s+=TX.a[i];return s;})})),fmt:$k,xEvery:1});
+}
+
+// ===== TRAVEL APPROVALS =====
+function rTa(){
+  const tj=TIX;let tot=0,prior=0,q3=0,q3n=0,q3a=0,openN=0,openA=0,unr=0,out=0;for(const j of tj){tot+=TA.total[j];prior+=TA.prior_air[j];q3a+=TA.q3_air[j];q3n+=TA.q3_nonair[j];openN+=TA.open_nonair[j];openA+=TA.open_air[j];unr+=TA.exp_unraised[j];out+=TA.nonair[j]*(1-TA.q3share[j]);}
+  q3=q3a+q3n;const incurred=q3-openN-openA;
+  const trav=IDX.filter(i=>TRAVX.has(TX.x[i])&&TX.a[i]>0);const taE=new Set(tj.map(j=>TA.e[j]));let noTa=0;const noTaE=new Map();for(const i of trav)if(!taE.has(TX.e[i])){noTa+=TX.a[i];noTaE.set(TX.e[i],(noTaE.get(TX.e[i])||[]).concat(i));}
+  let lk=0;for(const i of IDX)if(TX.lk[i]&&TX.d[i]<=LC)lk+=TX.a[i];
+  const acc=incurred>0?lk/incurred:null;
+  document.getElementById('taKpis').innerHTML=stat('Approved travel',$k(tot),int(tj.length)+' approvals, '+int(taE.size)+' travellers')+stat('Lands in Q3',$k(q3),'After removing last-quarter airfare and November days','var(--navy)')+stat('Already incurred',$k(incurred),'Estimate for trip days and bookings to '+dL(LC),'var(--teal)')+stat('Open commit',$k(openN+openA),$k(openN)+' trip costs, '+$k(openA)+' unbooked airfare','var(--purple)')+stat('Not yet approved',$k(unr),'Expected trip costs still to be approved','#B490F0')+stat('Estimate accuracy',acc==null?'–':pc(acc),'Actual trip spend vs the approved estimate so far',acc>1.15||acc<0.85?'var(--orange)':'var(--green)');
+  const twItems=[{label:'Approved travel',v:tot,kind:'total',color:'#032D60'},{label:'Airfare booked last quarter',v:-prior,kind:'delta',color:'#8E9CAD',note:'Approvals raised before Aug 1. Their airfare was expensed in Q2.'},{label:'Trip days after '+dL(QD-1),v:-out,kind:'delta',color:'#C9C9C9',note:'Hotel and other costs for days that fall in Q4'},{label:'Lands in Q3',v:q3,kind:'total',color:'#0176D3'},{label:'Already incurred',v:-incurred,kind:'delta',color:'#06A59A',note:'Airfare booked in Q3 plus trip costs for days to '+dL(LC)},{label:'Open commit',v:openN+openA,kind:'total',color:'#7526E3'}];
+  chart('cTaWater',{type:'waterfall',labels:twItems.map(x=>x.label),items:twItems,fmt:$k});
+  document.getElementById('howTa').innerHTML='Each approval is split into airfare and on-trip costs (hotel, rail and other). Airfare counts in the quarter it is booked, which is assumed to be when the approval is raised. So airfare on approvals raised before Aug 1 sits in last quarter, and airfare on Q3 approvals is already in spend to date. The exception is airfare for future trips where no matching flight booking appears in the expense data, which stays open. On-trip costs count on the travel days and are split by day, so only days after '+dL(LC)+' are still open. '+(M.inrFixes?M.inrFixes+' approvals entered in rupees rather than dollars were converted (they totalled '+$f(M.inrOrig)+' as entered and '+$f(M.inrUsd)+' after conversion).':'');
+  const wk=Array.from({length:NW},(_,i)=>i+1),inc=new Float64Array(NW+1),op=new Float64Array(NW+1),ex=new Float64Array(NW+1);
+  for(const j of tj){const per=TA.nonair[j]/TA.days[j];for(let d=Math.max(0,TA.sday[j]);d<=Math.min(QD-1,TA.eday[j]);d++){const w=weekOf(d);if(d<=LC)inc[w]+=per;else{op[w]+=per;ex[w]+=per*(1/cov(d-LC)-1);}}
+    const bw=weekOf(Math.max(0,Math.min(QD-1,TA.sday[j])));if(TA.q3_air[j]){if(TA.open_air[j])op[bw]+=TA.open_air[j];else inc[Math.max(1,weekOf(Math.max(0,TA.cday[j])))]+=TA.q3_air[j];}}
+  chart('cTaWeek',{type:'bar',labels:wk.map(wL),series:[{name:'Already incurred',data:wk.map(w=>inc[w]),color:'#0176D3',stack:'a'},{name:'Approved, still to come',data:wk.map(w=>op[w]),color:'#9050E9',stack:'a'},{name:'Expected, not yet approved',data:wk.map(w=>ex[w]),color:'#D8CBF7',stack:'a'}],fmt:$k,title:i=>wL(i+1)+', '+wR(i+1),vline:{i:weekOf(LC)-1,off:0.5,label:'Today'}});
+  const reasons=DI.tr.map((r,ri)=>({r,d:tj.filter(j=>TA.tr[j]===ri&&!TA.intl[j]).reduce((s,j)=>s+TA.total[j],0),i:tj.filter(j=>TA.tr[j]===ri&&TA.intl[j]).reduce((s,j)=>s+TA.total[j],0)})).filter(x=>x.d+x.i>0).sort((a,b)=>(b.d+b.i)-(a.d+a.i));
+  chart('cTaReason',{type:'hbar',labels:reasons.map(r=>r.r),series:[{name:'Domestic',data:reasons.map(r=>r.d),color:'#0176D3'},{name:'International',data:reasons.map(r=>r.i),color:'#9050E9'}],fmt:$k});
+  const LB=[[-99,0,'Same day or after'],[1,3,'1 to 3 days'],[4,7,'4 to 7'],[8,14,'8 to 14'],[15,30,'15 to 30'],[31,999,'31+ days']];
+  chart('cLead',{type:'bar',labels:LB.map(b=>b[2]),series:[{name:'Approvals',data:LB.map(b=>tj.filter(j=>{const l=TA.sday[j]-TA.cday[j];return l>=b[0]&&l<=b[1];}).length),color:'#0176D3'}],colorAt:(x,i)=>i<=1?'#DD7A01':'#0176D3',fmt:v=>int(v)});
+  const lm=new Map();const gL=k=>{let o=lm.get(k);if(!o){o={k,n:0,tr:new Set(),tot:0,q3:0,open:0,inc:0,act:0,noTa:0};lm.set(k,o);}return o;};
+  for(const j of tj){const o=gL(TA.ld[j]);o.n++;o.tr.add(TA.e[j]);o.tot+=TA.total[j];const q=TA.q3_air[j]+TA.q3_nonair[j],op2=TA.open_air[j]+TA.open_nonair[j];o.q3+=q;o.open+=op2;o.inc+=q-op2;}
+  for(const i of IDX)if(TX.lk[i]&&TX.d[i]<=LC)gL(TX.ld[i]).act+=TX.a[i];noTaE.forEach((rs,e)=>{for(const i of rs)gL(TX.ld[i]).noTa+=TX.a[i];});
+  const LR=[...lm.values()].map(o=>({...o,n2:DI.ld[o.k],trv:o.tr.size,acc:o.inc>0?o.act/o.inc:null}));
+  table('tTaLeader',[{k:'n2',l:'Leader',f:r=>lnk('ld',r.n2)},{k:'n',l:'Approvals',n:1},{k:'trv',l:'Travellers',n:1},{k:'tot',l:'Approved',n:1,f:r=>$f(r.tot)},{k:'q3',l:'Lands in Q3',n:1,f:r=>$f(r.q3)},{k:'inc',l:'Incurred (estimate)',n:1,f:r=>$f(r.inc)},{k:'act',l:'Actual trip spend',n:1,f:r=>$f(r.act)},{k:'acc',l:'Accuracy',n:1,f:r=>r.acc==null?'–':'<span class="bdg '+(r.acc>1.15?'over':r.acc<0.85?'watch':'ok')+'">'+pc(r.acc)+'</span>'},{k:'open',l:'Open commit',n:1,f:r=>'<b>'+$f(r.open)+'</b>'},{k:'noTa',l:'Travel without TA',n:1,f:r=>r.noTa?'<span style="color:var(--red)">'+$f(r.noTa)+'</span>':'–'}],LR,{sort:'open'});
+  const NR=[...noTaE.entries()].map(([e,rs])=>{let a=0,ai=0;for(const i of rs){a+=TX.a[i];if(TX.x[i]===AIRX)ai+=TX.a[i];}return {name:DI.e[e],ld:DI.ld[TX.ld[rs[0]]],a,ai,n:rs.length};});
+  table('tNoTa',[{k:'name',l:'Employee',f:r=>lnk('e',r.name)+'<span class="mt">'+esc(r.ld)+'</span>'},{k:'a',l:'Travel spend',n:1,f:r=>$f(r.a)},{k:'ai',l:'Of which airfare',n:1,f:r=>$f(r.ai)},{k:'n',l:'Lines',n:1}],NR,{sort:'a',limit:100,empty:'Every traveller in view has an approval on file.'});
+  document.getElementById('taFix').textContent=M.inrFixes?'Note: '+M.inrFixes+' India domestic approvals in this view were entered in rupees in the TA sheet and have been converted to dollars.':'';
+}
+
+// ===== CONTROLS =====
+function rControls(){
+  const ix=IDX,tot=sum(ix);const fs=M.flags.map((f,b)=>{const r=ix.filter(i=>(TX.f[i]&(1<<b))&&TX.a[i]>0);return {f,l:FLBL[f],a:sum(r),n:r.length,e:new Set(r.map(i=>TX.e[i])).size};}).sort((a,b)=>b.a-a.a);
+  const any=ix.filter(i=>TX.f[i]&&TX.a[i]>0),anyS=sum(any);const NS=DI.s.indexOf('Not Submitted');const ns=ix.filter(i=>TX.s[i]===NS);let na=0;for(const i of ix)if(NOTAPP.has(TX.s[i]))na+=TX.a[i];const sb=ix.filter(i=>DI.s[TX.s[i]]==='Sent Back to Employee');
+  document.getElementById('cStats').innerHTML=stat('Flagged spend',$k(anyS),int(any.length)+' lines, '+pc(tot?anyS/tot:0)+' of spend','var(--red)')+stat('People with a flag',int(new Set(any.map(i=>TX.e[i])).size),'of '+int(new Set(ix.map(i=>TX.e[i])).size)+' with spend','var(--orange)')+stat('Not yet approved',$k(na),pc(tot?na/tot:0)+' of spend','var(--amber)')+stat('Sent back to employee',$k(sum(sb)),sb.length+' lines awaiting correction');
+  chart('cFlags',{type:'hbar',labels:fs.map(f=>f.l),series:[{name:'Flagged spend',data:fs.map(f=>f.a),color:'#BA0517'}],fmt:$k,tipFn:i=>'<b>'+esc(fs[i].l)+'</b><div>'+$f(fs[i].a)+' on '+fs[i].n+' lines</div><div>'+fs[i].e+' people</div>'});
+  const SO=['Approved','Submitted & Pending Approval','Pending Audit Review - AI','Sent Back to Employee','Not Submitted','Unassigned'];const ss=SO.map(s=>{const k=DI.s.indexOf(s);const r=ix.filter(i=>TX.s[i]===k);return {s,a:sum(r),n:r.length};});
+  chart('cStatus',{type:'hbar',labels:ss.map(s=>s.s),series:[{name:'Spend',data:ss.map(s=>s.a),color:'#2E844A'}],colorAt:(x,i)=>ss[i].s==='Approved'?'#2E844A':ss[i].s.startsWith('Sent')?'#BA0517':ss[i].s.startsWith('Not')||ss[i].s==='Unassigned'?'#DD7A01':'#1B96FF',fmt:$k,tipFn:i=>'<b>'+esc(ss[i].s)+'</b><div>'+$f(ss[i].a)+' on '+int(ss[i].n)+' lines</div>'});
+  const AG=[[0,14,'0 to 14 days'],[15,30,'15 to 30'],[31,45,'31 to 45'],[46,999,'46+ days']];const ag=AG.map(a=>ns.filter(i=>LAST-TX.d[i]>=a[0]&&LAST-TX.d[i]<=a[1]));
+  chart('cAging',{type:'bar',labels:AG.map(a=>a[2]),series:[{name:'Not submitted',data:ag.map(sum),color:'#DD7A01'}],colorAt:(x,i)=>['#FCC003','#FE9339','#DD7A01','#BA0517'][i],fmt:$k});
+  document.getElementById('agingSub').textContent='Spend never submitted, by days since the transaction, as of '+dL(LAST)+'. '+$k(sum(ns))+' in total.';
+  const pk=fn=>{const r=ix.filter(fn);return [sum(r),r.length];};
+  const dq=[['Purpose not set',pk(i=>DI.p[TX.p[i]]==='Purpose not set'),'No report purpose yet, so customer-facing share is understated'],['No budget line',pk(i=>TX.ow[i]===NOBUD),'Reporting line has no budget holder in that region'],['Outside reporting line',pk(i=>DI.l1[TX.l1[i]]==='Outside reporting line'),'The assigned Leader is not in the employee\'s management chain'],['Not in employee master',pk(i=>DI.l1[TX.l1[i]]==='Not in employee master'),'Employee ID not in the employee master list'],['Credits and refunds',pk(i=>TX.a[i]<0),'Negative lines netted into spend'],['Route not captured',pk(i=>TX.x[i]===AIRX&&DI.sc[TX.sc[i]]==='Route not captured'),'Airfare with no airports, checked against the international limit']];
+  document.getElementById('dq').innerHTML='<table><tbody>'+dq.map(d=>'<tr><td><span class="nm">'+d[0]+'</span><span class="mt">'+d[2]+'</span></td><td class="n">'+$f(d[1][0])+'</td><td class="n">'+int(d[1][1])+' lines</td></tr>').join('')+'</tbody></table>';
+  const LG=[...grp(ix,i=>TX.ld[i]).values()].map(g=>{const fl=g.rows.filter(i=>TX.f[i]&&TX.a[i]>0);const by=M.flags.map((f,b)=>[f,g.rows.reduce((s,i)=>s+((TX.f[i]&(1<<b))&&TX.a[i]>0?TX.a[i]:0),0)]).sort((a,b)=>b[1]-a[1]);let n2=0;for(const i of g.rows)if(NOTAPP.has(TX.s[i]))n2+=TX.a[i];return {n:DI.ld[g.k],a:g.a,fl:sum(fl),fn:fl.length,r:g.a>0?sum(fl)/g.a:0,top:by[0][1]>0?FLBL[by[0][0]]:'–',na:n2,nar:g.a>0?n2/g.a:0};});
+  table('tCtlLeader',[{k:'n',l:'Leader',f:r=>lnk('ld',r.n)},{k:'a',l:'Spend',n:1,f:r=>$f(r.a)},{k:'fl',l:'Flagged',n:1,f:r=>$f(r.fl)},{k:'fn',l:'Lines',n:1},{k:'r',l:'Exception rate',n:1,f:r=>'<span class="bdg '+(r.r>0.3?'over':r.r>0.15?'watch':'ok')+'">'+pc(r.r)+'</span>'},{k:'top',l:'Main exception'},{k:'na',l:'Not approved',n:1,f:r=>$f(r.na)},{k:'nar',l:'Share not approved',n:1,f:r=>pc(r.nar)}],LG,{sort:'fl'});
+  const E=empAgg(any).map(e=>{const by=M.flags.map(f=>[f,0]);for(const i of any)if(TX.e[i]===e.e)M.flags.forEach((f,b)=>{if(TX.f[i]&(1<<b))by[b][1]+=TX.a[i];});return {...e,by};});
+  table('tCtlEmp',[{k:'name',l:'Employee',f:r=>lnk('e',r.name)+'<span class="mt">'+lineOf(r.ldn,r.l1n)+'</span>'},{k:'a',l:'Flagged spend',n:1,f:r=>'<b>'+$f(r.a)+'</b>'},{k:'n',l:'Lines',n:1},{k:'w',l:'Exceptions',sv:r=>r.by.filter(b=>b[1]>0).length,f:r=>r.by.filter(b=>b[1]>0).sort((a,b)=>b[1]-a[1]).map(b=>'<span class="bdg over" style="margin:1px 4px 1px 0">'+FLBL[b[0]]+' '+$k(b[1])+'</span>').join('')}],E,{sort:'a',limit:60});
+}
+
+// ===== POLICY LIMITS =====
+function rPolicy(){
+  const card=(icon,col,title,lims,note)=>'<div class="card"><h3><span class="ico" style="background:'+col+'">'+icon+'</span>'+title+'</h3>'+lims.map(l=>'<div class="lim"><span>'+l[0]+'</span><b>'+l[1]+'</b></div>').join('')+(note?'<p class="note">'+note+'</p>':'')+'</div>';
+  const plane='<svg viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 00-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></svg>',globe='<svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm6.9 6h-3a15 15 0 00-1.3-3.6A8 8 0 0118.9 8zM12 4a13 13 0 011.9 4h-3.8A13 13 0 0112 4zM4.3 14a8 8 0 010-4h3.4a17 17 0 000 4zm.8 2h3a15 15 0 001.3 3.6A8 8 0 015.1 16zm3-8h-3a8 8 0 014.3-3.6A15 15 0 008.1 8zM12 20a13 13 0 01-1.9-4h3.8A13 13 0 0112 20zm2.3-6H9.7a15 15 0 010-4h4.6a15 15 0 010 4z"/></svg>',stop='<svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm5 11H7v-2h10z"/></svg>';
+  const L=M.limits||null;
+  const inr=v=>'₹'+Number(v).toLocaleString('en-US'), usd=v=>'$'+Number(v).toLocaleString('en-US');
+  if(!L){document.getElementById('pol').innerHTML='<div class="card"><p class="note">The policy limits are not available. Check the Policy Guildlines tab and rebuild.</p></div>';return;}
+  document.getElementById('pol').innerHTML=
+    card(plane,'#0176D3','India',[['Domestic airfare, per ticket',inr(L.inrAir)],['Hotel, per night',inr(L.inrHotel)]])+
+    card(plane,'#06A59A','ASEAN',[['Airfare, per trip',usd(L.aseanAir)],['Hotel, per night',usd(L.aseanHotel)]])+
+    card(globe,'#9050E9','International travel',[['Airfare, maximum',usd(L.intlAir)],['Hotel, per night',usd(L.intlHotel)]])+
+    card(stop,'#BA0517','Non-customer-facing travel',[['Status',L.freeze?'Freeze in effect':'No freeze in the policy text']])+
+    '<div class="card" style="grid-column:1/-1"><h3>Full policy text</h3>'+(M.policyLines||[]).map(x=>'<p class="note">'+esc(x)+'</p>').join('')+'<p class="note">Source: the Policy Guildlines tab. Figures refresh on each rebuild.</p></div>';
+}
+
+// ===== insights + assistant are defined in js_ai.js and share this scope =====
+// ---------- insights ----------
+let INS=null;
+function insHTML(x){return '<div class="in sev-'+x.sev+'"><span class="dot"></span><div><h3>'+x.t+'</h3><p>'+x.b+'</p>'+(x.go?'<button class="act" data-go="'+x.go+'">'+(x.gl||'Open')+' ›</button>':'')+(x.fk?' <button class="act" data-fk="'+x.fk+'" data-fv="'+esc(x.fv)+'">Focus on '+esc(x.fv)+' ›</button>':'')+'</div></div>';}
+function insights(){
+  if(INS)return INS;const ix=IDX,out=[];const tot=sum(ix);if(!ix.length)return INS=[];
+  const fc=forecast(ix,TIX),sb=scopeBudget(ix);
+  // 1 landing vs budget
+  if(sb.b){const v=fc.land-sb.b;out.push({sev:v>0?'risk':'good',imp:Math.abs(v)+1e9,t:v>0?'Projected to overrun by '+$k(v):'Projected to land '+$k(-v)+' under budget',b:'Spend to date is '+$k(fc.qtd)+' against a '+$k(sb.b)+' budget. The TA-informed forecast lands at '+$k(fc.land)+(fc.mode==='ta'?', with '+$k(fc.openNon+fc.openAir)+' of approved travel still to come':'')+'. The straight run-rate gives '+$k(fc.rrLand||fc.land)+'.',go:'overview',gl:'See the forecast'});
+    // owners
+    const ow=sb.lines.map(l=>{const f=forecast(l.rows,taFor(l.oui,l.owi));return {n:l.n,v:f.land-l.b,b:l.b,q:f.qtd};}).filter(o=>o.b>0);
+    const over=ow.filter(o=>o.v>0).sort((a,b)=>b.v-a.v);if(over.length&&ow.length>1)out.push({sev:'risk',imp:over.reduce((s,o)=>s+o.v,0)+5e8,t:over.length+' of '+ow.length+' budget owners projected over',b:'The largest gaps are '+over.slice(0,3).map(o=>esc(o.n)+' ('+signed(o.v)+')').join(', ')+'. Together the overruns add up to '+$k(over.reduce((s,o)=>s+o.v,0))+'.',go:'overview',gl:'Budget owner pacing'});
+    const done=ow.filter(o=>o.q>o.b);if(done.length)out.push({sev:'risk',imp:4e8,t:done.length===1?esc(done[0].n)+' has already spent the full-quarter budget':done.length+' owners have already spent their full-quarter budget',b:done.slice(0,4).map(o=>esc(o.n)+': '+$k(o.q)+' spent of '+$k(o.b)).join('; ')+'.'});
+    const room=ow.filter(o=>o.v<-0.25*o.b&&o.b>=30000).sort((a,b)=>a.v-b.v);if(room.length)out.push({sev:'good',imp:-room[0].v,t:'Headroom with '+esc(room[0].n),b:'Projected to land '+$k(-room[0].v)+' under a '+$k(room[0].b)+' budget'+(room.length>1?'. '+(room.length-1)+' other owner'+(room.length>2?'s have':' has')+' more than 25% headroom too':'')+', which could offset overruns elsewhere.'});}
+  // 2 unsubmitted ageing
+  const NS=DI.s.indexOf('Not Submitted');let old=0,oldN=0;const oldBy=new Map();for(const i of ix)if(TX.s[i]===NS&&LAST-TX.d[i]>30){old+=TX.a[i];oldN++;oldBy.set(TX.e[i],(oldBy.get(TX.e[i])||0)+TX.a[i]);}
+  if(old>2000){const top=[...oldBy.entries()].sort((a,b)=>b[1]-a[1]).slice(0,3);out.push({sev:'watch',imp:old,t:$k(old)+' unsubmitted for more than 30 days',b:oldN+' lines from '+oldBy.size+' people. The biggest are '+top.map(([e,a])=>esc(DI.e[e])+' ('+$k(a)+')').join(', ')+'. This spend is real but unreviewed, so it is not yet checked against policy.',go:'controls',gl:'See the backlog'});}
+  // 3 late booking premium (domestic + within ASEAN)
+  const air=ix.filter(i=>TX.x[i]===AIRX&&TX.a[i]>0&&TX.adv[i]!=null&&TX.adv[i]>=0&&['Domestic','Within ASEAN'].includes(DI.sc[TX.sc[i]]));const late=air.filter(i=>TX.adv[i]<=3),early=air.filter(i=>TX.adv[i]>=8);
+  if(late.length>=10&&early.length>=10){const al=sum(late)/late.length,ae=sum(early)/early.length;if(al>ae*1.08){const sav=(al-ae)*late.length;out.push({sev:'watch',imp:sav,t:'Booking late costs about '+$k(sav)+' on regional flights',b:'Regional tickets booked 3 days or less ahead average '+$f(al)+', against '+$f(ae)+' when booked 8 or more days ahead. '+late.length+' tickets were booked late.',go:'travel',gl:'See booking lead time'});}}
+  // 4 hotel over cap concentration
+  const hb=M.flags.indexOf('hotel_cap');const ho=ix.filter(i=>(TX.f[i]&(1<<hb))&&TX.a[i]>0);if(ho.length){const byc=[...grp(ho.filter(i=>DI.c[TX.c[i]]),i=>TX.c[i]).values()].sort((a,b)=>b.a-a.a);const s=sum(ho);out.push({sev:'watch',imp:s*0.5,t:$k(s)+' of hotel nights above the policy limit',b:ho.length+' nights in total.'+(byc[0]?' The largest city is '+esc(DI.c[byc[0].k])+' at '+$k(byc[0].a)+' ('+pc(byc[0].a/s)+')'+(byc[1]?', then '+esc(DI.c[byc[1].k])+' at '+$k(byc[1].a):'')+'.':''),go:'travel',gl:'Hotel rates by city'});}
+  // 5 travel without TA
+  const taE=new Set(TIX.map(j=>TA.e[j]));const tr=ix.filter(i=>TRAVX.has(TX.x[i])&&TX.a[i]>0);let nt=0;const ntE=new Map();for(const i of tr)if(!taE.has(TX.e[i])){nt+=TX.a[i];ntE.set(TX.e[i],(ntE.get(TX.e[i])||0)+TX.a[i]);}
+  if(nt>3000){const top=[...ntE.entries()].sort((a,b)=>b[1]-a[1])[0];out.push({sev:'risk',imp:nt,t:$k(nt)+' of travel with no approval on file',b:ntE.size+' people booked flights or hotels without a travel approval in the TA sheet, '+pc(sum(tr)?nt/sum(tr):0)+' of travel spend. The largest is '+esc(DI.e[top[0]])+' at '+$k(top[1])+'.',go:'ta',gl:'See who'});}
+  // 6 concentration
+  const E=empAgg(ix).sort((a,b)=>b.a-a.a);if(E.length>=20){const t10=E.slice(0,10),s10=t10.reduce((s,e)=>s+e.a,0);out.push({sev:'info',imp:s10*0.2,t:'10 people account for '+pc(tot?s10/tot:0)+' of spend',b:'Led by '+t10.slice(0,3).map(e=>esc(e.name)+' ('+$k(e.a)+')').join(', ')+'. '+E.length+' people have spend in this view.',go:'people',gl:'See employees'});}
+  // 7 outliers vs peers (same Leader+1 team)
+  const byT=new Map();E.forEach(e=>{const k=e.l1i;if(!byT.has(k))byT.set(k,[]);byT.get(k).push(e);});const outl=[];byT.forEach(g=>{if(g.length<4)return;const s=g.map(e=>e.a).sort((a,b)=>a-b),md=s[Math.floor(s.length/2)];g.forEach(e=>{if(md>0&&e.name!==e.l1n&&e.a>5*md&&e.a>10000)outl.push({...e,md});});});
+  outl.sort((a,b)=>b.a-a.a);if(outl.length){const o=outl[0];out.push({sev:'watch',imp:o.a-o.md,t:esc(o.name)+' spends '+(o.a/o.md).toFixed(1)+'× the team median',b:$k(o.a)+' against a median of '+$k(o.md)+' in '+esc(PHS.has(o.l1n)?o.ldn:o.l1n)+'\'s team. Mostly '+esc(o.topc.toLowerCase())+'.'+(outl.length>1?' '+(outl.length-1)+' other people stand out the same way.':''),fk:'e',fv:o.name});}
+  // 8 category momentum (last 4 complete weeks vs previous 4, excluding events)
+  if(LCW>=9){const cur=new Float64Array(6),prev=new Float64Array(6);for(const i of ix){if(EVENTS.has(TX.p[i]))continue;const w=WK[i];if(w>LCW-4&&w<=LCW)cur[CI[i]]+=TX.a[i];else if(w>LCW-8&&w<=LCW-4)prev[CI[i]]+=TX.a[i];}
+    let best=-1,bv=0;CATS.forEach((c,ci)=>{if(prev[ci]>5000){const g=(cur[ci]-prev[ci])/prev[ci];if(g>bv){bv=g;best=ci;}}});
+    if(best>=0&&bv>0.12)out.push({sev:'watch',imp:cur[best]-prev[best],t:CATS[best]+' up '+pc(bv)+' in the last four weeks',b:$k(cur[best])+' in weeks '+(LCW-3)+' to '+LCW+' against '+$k(prev[best])+' in the four weeks before, leaving out Dreamforce and kickoff spend.',go:'cats',gl:'Category trend'});}
+  // 9 customer-facing share
+  let cu=0;for(const i of ix)if(TX.cu[i])cu+=TX.a[i];const cs=tot?cu/tot:0;const lows=[...grp(ix,i=>TX.ld[i]).values()].filter(g=>g.a>15000).map(g=>{let c=0;for(const i of g.rows)if(TX.cu[i])c+=TX.a[i];return {n:DI.ld[g.k],p:c/g.a};}).filter(x=>x.p<0.35).sort((a,b)=>a.p-b.p);
+  out.push({sev:cs<0.45?'watch':'good',imp:tot*0.05,t:'Customer-facing share is '+pc(cs),b:(lows.length?'Lowest among larger leaders: '+lows.slice(0,3).map(l=>esc(l.n)+' ('+pc(l.p)+')').join(', ')+'. ':'')+'About '+pc(sum(ix.filter(i=>DI.p[TX.p[i]]==='Purpose not set'))/(tot||1))+' of spend has no purpose yet, so the true share is likely higher once reports are filed.',go:'cats',gl:'Purpose mix'});
+  // 10 premium cabin
+  const pb=M.flags.indexOf('premium');const pr=ix.filter(i=>(TX.f[i]&(1<<pb))&&TX.a[i]>0);if(pr.length){const s=sum(pr);const by=[...grp(pr,i=>TX.e[i]).values()].sort((a,b)=>b.a-a.a);out.push({sev:'risk',imp:s,t:$k(s)+' in business or first class',b:pr.length+' tickets by '+by.length+' people. Economy is the default and upgrades need budget headroom. Largest: '+by.slice(0,3).map(g=>esc(DI.e[g.k])+' ('+$k(g.a)+')').join(', ')+'.',go:'controls',gl:'See exceptions'});}
+  // 11 TA estimate accuracy
+  let inc=0,act=0;for(const j of TIX)inc+=TA.q3_air[j]+TA.q3_nonair[j]-TA.open_air[j]-TA.open_nonair[j];for(const i of ix)if(TX.lk[i]&&TX.d[i]<=LC)act+=TX.a[i];
+  if(inc>20000){const r=act/inc;if(r>1.15||r<0.85)out.push({sev:'watch',imp:Math.abs(act-inc),t:'Approvals '+(r>1?'under':'over')+'estimate trips by '+pc(Math.abs(r-1)),b:'Actual spend on approved trips so far is '+$k(act)+' against an approved estimate of '+$k(inc)+' for the same days. Treat the open commit of '+$k(fc.openNon+fc.openAir||0)+' as '+(r>1?'a floor':'a ceiling')+'.',go:'ta',gl:'Commit and accuracy'});else out.push({sev:'good',imp:5000,t:'Travel approvals are a reliable guide',b:'Actual spend on approved trips is within '+pc(Math.abs(r-1))+' of the approved estimate ('+$k(act)+' against '+$k(inc)+').',go:'ta',gl:'Commit and accuracy'});}
+  // 12 October pipeline thin
+  if(fc.mode==='ta'&&fc.unr>fc.openNon*0.25)out.push({sev:'info',imp:fc.unr,t:'October travel is not fully approved yet',b:'Approved trips cover '+$k(fc.openNon)+' of on-trip costs after '+dL(LC)+'. Based on how late approvals are usually raised, about '+$k(fc.unr)+' more is likely, and it is already in the forecast.',go:'ta',gl:'Commit by week'});
+  // 13 split receipts
+  const spb=M.flags.indexOf('split');const sp=ix.filter(i=>(TX.f[i]&(1<<spb))&&TX.a[i]>0);if(sp.length>=6)out.push({sev:'info',imp:sum(sp)*0.3,t:sp.length+' possible split receipts',b:'Two or more meal, hotel or entertainment lines from the same person, day and vendor, worth '+$k(sum(sp))+'. These are worth a quick audit.',go:'controls',gl:'See exceptions'});
+  const order={risk:0,watch:1,good:2,info:3};
+  INS=out.sort((a,b)=>b.imp-a.imp);return INS;
+}
+function rInsights(){const ins=insights();document.getElementById('insCount').textContent=ins.length+' found';document.getElementById('insAll').innerHTML=ins.map(insHTML).join('')||'<div class="empty">No notable patterns in this view.</div>';}
+
+// ---------- assistant (works offline: it reads the same data as the dashboard) ----------
+const PEOPLE=[];(function(){const seen=new Map();const add=(k,arr)=>arr.forEach((n,i)=>{if(!n||/^(Not in|Outside|No budget|Employee Attrition)/.test(n))return;const key=n.toLowerCase();if(!seen.has(key)){seen.set(key,{n,refs:[]});PEOPLE.push(seen.get(key));}seen.get(key).refs.push([k,i]);});add('ld',DI.ld);add('ow',DI.ow);add('l1',DI.l1);add('l2',DI.l2);add('e',DI.e);})();
+const CATWORDS=[[/\b(air ?fare|flights?|tickets?|airlines?)\b/,'Airfare'],[/\b(hotels?|lodging|accommodation|stay)\b/,'Lodging'],[/\b(taxi|taxis|cab|cabs|uber|grab|ground|transport|car)\b/,'Ground transport'],[/\b(meals?|food|dinner|lunch)\b/,'Meals'],[/\bentertainment\b/,'Entertainment'],[/\b(fees?|booking fee)\b/,'Booking & fees']];
+function findPeople(q){const ql=' '+q.toLowerCase().replace(/[^a-z0-9\s]/g,' ')+' ';const hits=[];
+  for(const p of PEOPLE){const nl=p.n.toLowerCase().replace(/[^a-z0-9\s]/g,' ');if(ql.includes(' '+nl+' '))hits.push({p,s:100+nl.length});}
+  if(hits.length)return hits.sort((a,b)=>b.s-a.s).filter((h,i,arr)=>!arr.some(o=>o!==h&&o.p.n.toLowerCase().includes(h.p.n.toLowerCase())&&o.p.n.length>h.p.n.length)).map(h=>h.p);
+  const words=ql.trim().split(/\s+/).filter(w=>w.length>=4&&!STOP.has(w));const cand=[];
+  for(const w of words){const m=PEOPLE.filter(p=>p.n.toLowerCase().split(/\s+/).includes(w));const mgr=m.filter(p=>p.refs.some(r=>r[0]!=='e'));const lead=mgr.filter(p=>p.refs.some(r=>r[0]==='ld'||r[0]==='ow'));const pick=lead.length===1?lead:mgr.length===1?mgr:m.length===1?m:[];pick.forEach(p=>{if(!cand.includes(p))cand.push(p);});}
+  return cand;}
+const STOP=new Set(['spend','spent','much','what','show','team','with','that','this','from','have','over','under','budget','travel','hotel','hotels','flights','airfare','total','about','which','where','when','many','people','leader','leaders','employee','employees','india','asean','week','weeks','month','approval','approvals','policy','top','most','biggest','highest','lowest','largest','compare','versus','cost','costs','meals','taxi','taxis','expense','expenses','city','cities','vendor','vendors','give','tell','list','forecast','landing','risk','their','they','does','doing','commit','spending','category','categories']);
+function rowsFor(p){const s=new Set();for(const [k,i] of p.refs){for(const r of IDX)if(TX[k][r]===i)s.add(r);}return [...s];}
+function taFor2(p){const s=new Set();for(const [k,i] of p.refs){if(!(k in TA))continue;for(const j of TIX)if(TA[k][j]===i)s.add(j);}return [...s];}
+function roleOf(p){const ks=new Set(p.refs.map(r=>r[0]));return ks.has('ld')?'Leader':ks.has('ow')?'Budget owner':ks.has('l1')?'Leader+1':ks.has('l2')?'Leader+2':'Employee';}
+function tbl(h,rows){return '<table><thead><tr>'+h.map((x,i)=>'<th'+(i?' class="n"':'')+'>'+x+'</th>').join('')+'</tr></thead><tbody>'+rows.map(r=>'<tr>'+r.map((x,i)=>'<td'+(i?' class="n"':'')+'>'+x+'</td>').join('')+'</tr>').join('')+'</tbody></table>';}
+function topN(q){const m=q.match(/\b(top|best|worst)\s*(\d+)/)||q.match(/\b(\d+)\s+(biggest|largest|top|highest)/);const n=m?+(m[2]||m[1]):5;return Math.max(1,Math.min(15,isNaN(n)?5:n));}
+function answer(raw){
+  const q=raw.toLowerCase().trim();if(!q)return {h:'Ask me anything about the spend in this dashboard.'};
+  let ix=IDX;const notes=[];
+  let cat=null;for(const [re,c] of CATWORDS)if(re.test(q)){cat=c;break;}
+  if(/\bindia\b/.test(q)){const r=DI.ou.indexOf('India');ix=ix.filter(i=>TX.ou[i]===r);notes.push('India');}
+  if(/\basean\b/.test(q)){const r=DI.ou.indexOf('ASEAN');ix=ix.filter(i=>TX.ou[i]===r);notes.push('ASEAN');}
+  const ppl=findPeople(raw);const city=DI.c.find(c=>c&&c.length>3&&q.includes(c.toLowerCase()));const vend=DI.v.find(v=>v&&v.length>3&&v!=='Not specified'&&new RegExp('\\b'+v.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\b').test(q));
+  const scopeTxt=()=> (notes.length?' in '+notes.join(', '):'')+(F.ld>=0||F.e>=0||F.l1>=0||F.l2>=0||F.ou>=0?' (within your current filters)':'');
+  let xt=null;for(const [re,x] of [[/\b(taxi|taxis|cab|cabs)\b/,'Taxi'],[/\brental cars?\b/,'Rental Car'],[/\bmileage\b/,'Personal Car Mileage'],[/\broom tax\b/,'Room Tax'],[/\bclient (meals?|dinners?)\b/,'Business Meals - Clients/Non-Employees']])if(re.test(q)){xt=DI.x.indexOf(x);break;}
+  const catIx=r=>xt!=null&&xt>=0?r.filter(i=>TX.x[i]===xt):cat?r.filter(i=>CATS[CI[i]]===cat):r;
+  const catName=()=>xt!=null&&xt>=0?DI.x[xt].toLowerCase():cat?cat.toLowerCase():'';
+  if(/^(hi|hello|hey|help|what can you do)/.test(q))return {h:'I answer questions from the data in this dashboard. For example, how much did a leader spend on hotels, who is over budget, the top 5 spenders, or how much travel is still committed.',s:SUGG};
+  // compare
+  if(/\b(compare|vs|versus)\b/.test(q)&&ppl.length>=2){const rows=ppl.slice(0,4).map(p=>{const r=catIx(rowsFor(p).filter(i=>ix.includes(i)));const f=forecast(r,taFor2(p));return [esc(p.n),$k(sum(r)),int(new Set(r.map(i=>TX.e[i])).size),$k(f.land)];});return {h:'Here is the comparison'+(catName()?' for '+catName():'')+scopeTxt()+'. Each figure covers the person\'s whole reporting line.'+tbl(['Name','Spend','People','Projected landing'],rows),a:ppl.slice(0,2)};}
+  // budget / forecast
+  if(/\b(budget|over ?run|overspend|landing|forecast|projected|on track|at risk|pacing)\b/.test(q)&&!cat){
+    if(ppl.length){const p=ppl[0];const r=rowsFor(p),tj=taFor2(p),f=forecast(r,tj);const own=BUD.filter(b=>b.n===p.n);
+      let h='<b>'+esc(p.n)+'</b> ('+roleOf(p)+') has spent '+$k(f.qtd)+' so far and is projected to land at '+$k(f.land)+'.';
+      if(own.length){const bt=own.reduce((s,b)=>s+b.b,0);const rr=r.filter(i=>own.some(b=>b.owi===TX.ow[i]&&b.oui===TX.ou[i]));const f2=forecast(rr,TIX.filter(j=>own.some(b=>b.owi===TA.ow[j]&&b.oui===TA.ou[j])));h+=' As a budget owner they hold '+$k(bt)+'. Spend charged to that budget is '+$k(f2.qtd)+', projected '+$k(f2.land)+', which is <b>'+(f2.land>bt?signed(f2.land-bt)+' over':$k(bt-f2.land)+' under')+'</b>.';}
+      else h+=' They do not hold a budget line directly, so their spend is charged to a budget owner above or below them.';
+      return {h,a:[p]};}
+    const sb=scopeBudget(ix),f=forecast(ix,TIX);if(sb.b==null)return {h:'Budget comparison needs a whole-spend view. Remove the category, purpose or status filter and ask again.'};
+    const ow=sb.lines.map(l=>{const f3=forecast(l.rows,taFor(l.oui,l.owi));return {n:l.n,ou:l.ou,v:f3.land-l.b,b:l.b,l:f3.land};}).filter(o=>o.b>0).sort((a,b)=>b.v-a.v);const over=ow.filter(o=>o.v>0);
+    return {h:'The view lands at <b>'+$k(f.land)+'</b> against '+$k(sb.b)+', so <b>'+(f.land>sb.b?signed(f.land-sb.b)+' over':$k(sb.b-f.land)+' under')+'</b>. '+over.length+' of '+ow.length+' budget owners are projected over.'+(over.length?tbl(['Owner','Budget','Landing','Gap'],over.slice(0,8).map(o=>[esc(o.n)+' <span class="mt" style="display:inline">'+o.ou+'</span>',$k(o.b),$k(o.l),'<b style="color:var(--red)">'+signed(o.v)+'</b>'])):'')};}
+  // commit / TA
+  if(/\b(commit|commits|committed|commitment|ta|tas|travel approval|approvals?|pipeline|upcoming|planned)\b/.test(q)){const tj=ppl.length?taFor2(ppl[0]):TIX;let o=0,on=0,oa=0,tot=0,q3=0;for(const j of tj){tot+=TA.total[j];q3+=TA.q3_air[j]+TA.q3_nonair[j];on+=TA.open_nonair[j];oa+=TA.open_air[j];}
+    const up=tj.filter(j=>TA.sday[j]>LC).sort((a,b)=>TA.total[b]-TA.total[a]).slice(0,6);
+    return {h:(ppl.length?'<b>'+esc(ppl[0].n)+'</b>: ':'')+int(tj.length)+' approved trips worth '+$k(tot)+'. '+$k(q3)+' of it lands in Q3, and <b>'+$k(on+oa)+'</b> is still to come ('+$k(on)+' on-trip costs and '+$k(oa)+' airfare not yet booked).'+(up.length?' Largest upcoming trips:'+tbl(['Traveller','Starts','Estimate'],up.map(j=>[esc(DI.e[TA.e[j]])+'<span class="mt">'+esc(TA.route[j])+'</span>',dL(TA.sday[j]),$k(TA.total[j])])):''),a:ppl.slice(0,1)};}
+  // policy
+  if(/\b(policy|violation|violations|exception|exceptions|flag|flagged|breach|non.?compliant|compliance)\b/.test(q)){let r=ppl.length?rowsFor(ppl[0]).filter(i=>ix.includes(i)):ix;r=catIx(r);const fl=r.filter(i=>TX.f[i]&&TX.a[i]>0);const by=M.flags.map((f,b)=>({l:FLBL[f],a:sum(fl.filter(i=>TX.f[i]&(1<<b))),n:fl.filter(i=>TX.f[i]&(1<<b)).length})).filter(x=>x.n).sort((a,b)=>b.a-a.a);
+    const pe=[...grp(fl,i=>TX.e[i]).values()].sort((a,b)=>b.a-a.a).slice(0,5);
+    return {h:(ppl.length?'<b>'+esc(ppl[0].n)+'</b>: ':'')+$k(sum(fl))+' of flagged spend on '+fl.length+' lines'+scopeTxt()+'.'+(by.length?tbl(['Exception','Spend','Lines'],by.map(x=>[x.l,$k(x.a),x.n])):'')+(pe.length&&!(ppl.length&&roleOf(ppl[0])==='Employee')?' Most flagged: '+pe.map(g=>esc(DI.e[g.k])+' ('+$k(g.a)+')').join(', ')+'.':''),a:ppl.slice(0,1)};}
+  // backlog
+  if(/\b(unsubmitted|not submitted|pending|backlog|unapproved|not approved|approval status|unassigned|sent back)\b/.test(q)){let r=ppl.length?rowsFor(ppl[0]).filter(i=>ix.includes(i)):ix;const by=DI.s.map((s,k)=>({s,a:sum(r.filter(i=>TX.s[i]===k)),n:r.filter(i=>TX.s[i]===k).length})).filter(x=>x.n&&x.s!=='Approved').sort((a,b)=>b.a-a.a);
+    const ns=DI.s.indexOf('Not Submitted');const pe=[...grp(r.filter(i=>TX.s[i]===ns),i=>TX.e[i]).values()].sort((a,b)=>b.a-a.a).slice(0,5);
+    return {h:(ppl.length?'<b>'+esc(ppl[0].n)+'</b>: ':'')+$k(by.reduce((s,x)=>s+x.a,0))+' is not yet approved'+scopeTxt()+'.'+tbl(['Status','Spend','Lines'],by.map(x=>[esc(x.s),$k(x.a),int(x.n)]))+(pe.length?' Largest unsubmitted: '+pe.map(g=>esc(DI.e[g.k])+' ('+$k(g.a)+')').join(', ')+'.':''),a:ppl.slice(0,1)};}
+  // rankings
+  if(/\b(top|biggest|largest|highest|most|rank|who spent|who spends|leaderboard)\b/.test(q)){const n=topN(q);let r=catIx(ix);if(city)r=r.filter(i=>DI.c[TX.c[i]]===city);if(ppl.length)r=r.filter(i=>rowsFor(ppl[0]).includes(i));
+    let key='e',lbl='People';if(/\b(vendors?|merchants?|suppliers?|airlines?|hotels? chain)\b/.test(q)){key='v';lbl='Vendors';}else if(/\b(cit(y|ies)|destinations?)\b/.test(q)){key='c';lbl='Cities';}else if(/\bleaders?\b/.test(q)&&!/\bleader\+/.test(q)){key='ld';lbl='Leaders';}else if(/\b(categor(y|ies)|expense types?)\b/.test(q)){key='x';lbl='Expense types';}else if(/\broutes?\b/.test(q)){key='rt';lbl='Routes';r=r.filter(i=>TX.x[i]===AIRX&&DI.rt[TX.rt[i]]);}
+    const g=[...grp(r,i=>TX[key][i]).values()].filter(x=>DI[key][x.k]&&DI[key][x.k]!=='Not specified').sort((a,b)=>b.a-a.a).slice(0,n);const tt=sum(r);
+    return {h:'Top '+g.length+' '+lbl.toLowerCase()+(cat?' for '+cat.toLowerCase():'')+(city?' in '+esc(city):'')+(ppl.length?' under '+esc(ppl[0].n):'')+scopeTxt()+':'+tbl([lbl.replace(/s$/,''),'Spend','Share'],g.map(x=>[esc(DI[key][x.k]),$k(x.a),pc(tt?x.a/tt:0)])),a:key==='e'||key==='ld'?g.slice(0,2).map(x=>({n:DI[key][x.k],refs:[[key,x.k]]})):[]};}
+  // trend
+  if(/\b(trend|weekly|week by week|over time|monthly|month)\b/.test(q)){let r=catIx(ppl.length?rowsFor(ppl[0]).filter(i=>ix.includes(i)):ix);const w=new Float64Array(LASTW+1);for(const i of r)w[WK[i]]+=TX.a[i];const mA=r.filter(i=>TX.d[i]<=30),mS=r.filter(i=>TX.d[i]>30&&TX.d[i]<=60);
+    return {h:(ppl.length?'<b>'+esc(ppl[0].n)+'</b>'+(cat?', ':' ')+'':'')+(cat?cat+' ':'')+'spend by week'+scopeTxt()+'. August '+$k(sum(mA))+', September '+$k(sum(mS))+'.'+tbl(['Week','Spend'],Array.from({length:LASTW},(_,k)=>[wL(k+1)+' <span class="mt" style="display:inline">'+wR(k+1)+'</span>',$k(w[k+1])]).slice(1)),a:ppl.slice(0,1)};}
+  // insights
+  if(/\b(insight|insights|concern|worry|attention|summary|summarise|summarize|overview|highlights?|what should i)\b/.test(q)){const ins=insights().slice(0,5);return {h:'The main points for this view:<ul style="margin:6px 0 0;padding-left:18px">'+ins.map(x=>'<li><b>'+x.t+'.</b> '+x.b+'</li>').join('')+'</ul>'};}
+  // spend lookup (person / city / vendor / category)
+  if(ppl.length||city||vend||cat||xt!=null||/\b(spend|spent|total|how much|cost)\b/.test(q)){let r=ix,who=[];if(ppl.length){const p=ppl[0];const pr=new Set(rowsFor(p));r=r.filter(i=>pr.has(i));who.push('<b>'+esc(p.n)+'</b> ('+roleOf(p)+(roleOf(p)!=='Employee'?', including their team':'')+')');}
+    if(city){r=r.filter(i=>DI.c[TX.c[i]]===city);who.push('in '+esc(city));}if(vend){r=r.filter(i=>DI.v[TX.v[i]]===vend);who.push('with '+esc(vend));}
+    const all=r;r=catIx(r);const s=sum(r);const c=catSums(all);const people=new Set(r.map(i=>TX.e[i])).size;
+    let h=(who.length?(ppl.length?'':'Spend ')+who.join(' '):'Everything in view')+': <b>'+$k(s)+'</b>'+(catName()?' on '+catName():'')+' across '+int(r.length)+' lines and '+people+' '+(people===1?'person':'people')+scopeTxt()+'.';
+    if(!catName()&&s)h+=tbl(['Category','Spend','Share'],CATS.map((x,i)=>[x,$k(c[i]),pc(c[i]/(sum(all)||1))]).filter((_,i)=>c[i]));
+    if(ppl.length&&roleOf(ppl[0])!=='Employee'){const top=[...grp(r,i=>TX.e[i]).values()].sort((a,b)=>b.a-a.a).slice(0,3);if(top.length>1)h+=' Biggest spenders: '+top.map(g=>esc(DI.e[g.k])+' ('+$k(g.a)+')').join(', ')+'.';}
+    if(!r.length)h='I found no '+(cat?cat.toLowerCase()+' ':'')+'spend for that in the current view.';
+    return {h,a:ppl.slice(0,1)};}
+  return {h:'I could not match that to the data. Try a person\'s name, a category such as hotels or flights, a city, or a topic such as budget, commit, policy or unsubmitted.',s:SUGG};
+}
+const SUGG=['Who is over budget?','Top 5 spenders','How much is still committed?','Hotel spend by city','Policy exceptions','What should I worry about?'];
+function addMsg(html,who,acts,sugg){const m=document.createElement('div');m.className='m '+who;m.innerHTML=html;
+  if(acts&&acts.length){const d=document.createElement('div');d.className='acts';acts.forEach(p=>{const ref=(p.refs||[]).find(r=>['ld','l1','l2','ow','e'].includes(r[0]));if(!ref)return;const b=document.createElement('button');b.textContent='Focus dashboard on '+p.n;b.onclick=()=>{filterTo(ref[0],DI[ref[0]][ref[1]]);addMsg('Done. The whole dashboard now shows '+esc(p.n)+'.','b');};d.appendChild(b);});if(d.childNodes.length)m.appendChild(d);}
+  const box=document.getElementById('msgs');box.appendChild(m);box.scrollTop=box.scrollHeight;}
+function ask(q){addMsg(esc(q),'u');let r;try{r=answer(q);}catch(e){r={h:'Something went wrong reading the data for that question. Try rephrasing it.'};console.error(e);}addMsg(r.h,'b',r.a);}
+document.getElementById('sugg').innerHTML=SUGG.map(s=>'<button type="button">'+s+'</button>').join('');
+document.getElementById('sugg').addEventListener('click',e=>{const b=e.target.closest('button');if(b)ask(b.textContent);});
+document.getElementById('askForm').addEventListener('submit',e=>{e.preventDefault();const i=document.getElementById('askIn');const v=i.value.trim();if(!v)return;i.value='';ask(v);});
+function openAsk(){const d=document.getElementById('drawer');d.classList.add('open');if(!document.getElementById('msgs').childNodes.length)addMsg('Hi. I can answer questions from this dashboard\'s data, for example who is over budget, how much a leader\'s team spent on hotels, or what travel is still committed. I respect the filters you have on.','b');setTimeout(()=>document.getElementById('askIn').focus(),50);}
+document.getElementById('fab').onclick=()=>{const d=document.getElementById('drawer');d.classList.contains('open')?d.classList.remove('open'):openAsk();};
+document.getElementById('askTop').onclick=openAsk;document.getElementById('closeAsk').onclick=()=>document.getElementById('drawer').classList.remove('open');
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.getElementById('drawer').classList.remove('open');});
+
+
+// ===== MESSAGES: Slack, live dashboard only (v3) =====
+const MS={ctx:null,err:null,sel:new Set(),tpl:'attention',filter:'all',q:'',items:[],pi:0,busy:false,timer:null};
+const STAT_CLS={'Over budget':'over','Projected over':'over','Watch':'watch','On track':'ok'};
+const MAX_SEL=50;
+function srv(fn,...args){return new Promise((res,rej)=>{if(!(window.google&&google.script&&google.script.run)){rej(new Error('Messaging works in the live dashboard. This preview has no server connection.'));return;}
+  google.script.run.withSuccessHandler(r=>{let j;try{j=JSON.parse(r);}catch(e){rej(new Error('Unexpected reply from the server.'));return;}j.ok?res(j):rej(new Error(j.error||'Something went wrong.'));})
+    .withFailureHandler(e=>rej(new Error(e&&e.message?e.message:String(e))))[fn](...args);});}
+function slackLink(t){return t.replace(/<(https?:\/\/[^|>\s]+)\|([^>]+)>/g,(m,u,l)=>'<a href="'+u.replace(/"/g,'&quot;')+'" target="_blank" rel="noopener">'+l.replace(/&/g,'&amp;')+'</a>').replace(/\*([^*\n]+)\*/g,'<b>$1</b>');}
+function bodyHTML(s){return String(s||'').split('\n').map(line=>{if(line.startsWith('> '))return '<div class="q">'+slackLink(line.slice(2))+'</div>';if(!line.trim())return '<div class="gap"></div>';return '<div>'+slackLink(line)+'</div>';}).join('');}
+function needsAttn(r){return r.status==='Over budget'||r.status==='Projected over'||r.status==='Watch';}
+function noteVal(){const el=document.getElementById('msgNote');return el?el.value.trim():'';}
+function tplTitle(){const t=(MS.ctx&&MS.ctx.templates||[]).find(x=>x.id===MS.tpl);return t?t.title:'';}
+async function rMessages(){if(!MS.ctx&&!MS.err){try{MS.ctx=await srv('apiMsgContext');}catch(e){MS.err=e.message;}}paintMessages();if(MS.ctx)loadLog();}
+function paintMessages(){
+  const C=MS.ctx,ban=document.getElementById('msgBanner'),wrap=document.getElementById('msgWrap');
+  if(MS.err||!C){ban.innerHTML='<div class="banner warn">'+esc(MS.err||'Loading…')+'</div>';wrap.hidden=true;return;}
+  wrap.hidden=false;
+  ban.innerHTML=C.slackConnected?'':'<div class="banner warn"><b>Slack is not connected yet.</b> The owner adds the bot token in Script properties. Sending stays off until then.</div>';
+  const rec=C.recipients,budget=rec.filter(r=>r.kind==='Budget holder').length,attn=rec.filter(needsAttn).length;
+  document.getElementById('msgBadge').textContent=attn?attn:'';
+  document.getElementById('msgCount').textContent=MS.sel.size+' selected · '+rec.length+' people you can message · '+budget+' budget holders';
+  document.getElementById('tplgrid').innerHTML=C.templates.map(t=>'<label class="tpl'+(MS.tpl===t.id?' on':'')+'"><input type="radio" name="tpl" value="'+t.id+'"'+(MS.tpl===t.id?' checked':'')+'><b>'+esc(t.title)+'</b><span>'+esc(t.desc)+'</span></label>').join('');
+  document.querySelectorAll('#msgFilters button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.f===MS.filter));
+  const left=C.dailyLimit-C.sentToday;
+  document.getElementById('sendHint').innerHTML='<b>'+MS.sel.size+'</b> selected · '+left+' messages left today'+(C.slackConnected?'':' · Slack not connected');
+  const can=C.slackConnected&&MS.sel.size>0&&!MS.busy&&(MS.tpl!=='note'||noteVal().length>0)&&left>=MS.sel.size;
+  document.getElementById('sendBtn').disabled=!can;
+  document.getElementById('noteCount').textContent=document.getElementById('msgNote').value.length;
+  paintList();
+}
+function paintList(){
+  const C=MS.ctx;if(!C)return;
+  const vis=C.recipients.filter(r=>{if(MS.filter==='budget'&&r.kind!=='Budget holder')return false;if(MS.filter==='managers'&&r.kind!=='Manager')return false;if(MS.filter==='attention'&&!needsAttn(r))return false;return !MS.q||r.name.toLowerCase().indexOf(MS.q)>=0;});
+  document.getElementById('rlist').innerHTML=vis.map(r=>{const on=MS.sel.has(r.name);return '<label class="rcp'+(on?' on':'')+'"><input type="checkbox" data-n="'+esc(r.name)+'"'+(on?' checked':'')+'><span class="nm">'+esc(r.name)+'</span><span class="bdg '+(STAT_CLS[r.status]||'na')+'" style="justify-self:end">'+esc(r.status||'—')+'</span><span class="kind">'+(r.kind==='Budget holder'?'Budget holder':'Manager')+'</span><span class="mail '+(r.hasEmail?'ok':'no')+'" style="justify-self:end">'+(r.hasEmail?'Slack ready':'No email')+'</span></label>';}).join('')||'<div class="empty">No one matches these filters.</div>';
+}
+function addSel(n,on){if(on){if(MS.sel.size>=MAX_SEL){alert('Choose up to '+MAX_SEL+' people per message.');return false;}MS.sel.add(n);}else MS.sel.delete(n);return true;}
+function schedulePreview(){clearTimeout(MS.timer);MS.timer=setTimeout(loadPreview,320);}
+async function loadPreview(){
+  const pv=document.getElementById('preview');
+  if(!MS.ctx){pv.innerHTML='';return;}
+  if(!MS.sel.size){MS.items=[];pv.innerHTML='<div class="empty">Select recipients to see exactly what each one will receive.</div>';navUpd();return;}
+  if(MS.tpl==='note'&&!noteVal()){MS.items=[];pv.innerHTML='<div class="empty">The note-only message needs a note. Write one above.</div>';navUpd();return;}
+  pv.innerHTML='<div class="empty">Building preview…</div>';
+  try{const j=await srv('apiMsgPreview',{template:MS.tpl,note:noteVal(),recipients:Array.from(MS.sel).sort().slice(0,5)});MS.items=j.items;MS.pi=0;}
+  catch(e){MS.items=[];pv.innerHTML='<div class="banner warn">'+esc(e.message)+'</div>';navUpd();return;}
+  showItem();
+}
+function showItem(){
+  const it=MS.items[MS.pi],pv=document.getElementById('preview');
+  if(!it){pv.innerHTML='';navUpd();return;}
+  pv.innerHTML='<div class="slack">'+bodyHTML(it.body)+'</div>'+(it.hasEmail?'':'<div class="banner warn" style="margin-top:10px">No work email on file for '+esc(it.name)+'. This person cannot receive the message until one is added.</div>')+'<div class="pfor">Sample '+(MS.pi+1)+' of '+MS.items.length+' · '+esc(it.name)+' sees their own figures. Each recipient gets their own version.</div>';
+  navUpd();
+}
+function navUpd(){document.getElementById('pIdx').textContent=MS.items.length?(MS.pi+1)+' / '+MS.items.length:'';document.getElementById('pPrev').disabled=MS.pi<=0;document.getElementById('pNext').disabled=MS.pi>=MS.items.length-1;}
+function openConfirm(){
+  const C=MS.ctx,names=Array.from(MS.sel).sort(),ok=names.filter(n=>{const r=C.recipients.find(x=>x.name===n);return r&&r.hasEmail;}),skip=names.length-ok.length;
+  const m=document.getElementById('modal');
+  m.innerHTML='<h3 id="mTitle">Send to '+ok.length+' '+(ok.length===1?'person':'people')+'?</h3>'+
+    (skip?'<div class="banner warn">'+skip+' selected '+(skip===1?'person has':'people have')+' no work email and will be skipped.</div>':'')+
+    '<p class="mnote"><b>Message type:</b> '+esc(tplTitle())+'.<br>Each person receives figures from their own dashboard view, never anyone else\'s. Messages go to Slack direct messages and stay there.</p>'+
+    '<div class="mlist">'+names.map(n=>'<span class="chip2">'+esc(n)+'</span>').join('')+'</div>'+
+    '<label class="confirm"><input type="checkbox" id="mOk"><span>I have checked the recipients and the message, and I understand these messages are sent to Slack.</span></label>'+
+    '<div class="mbtns"><button class="btn" id="mCancel">Cancel</button><button class="btn brand" id="mSend" disabled>Send messages</button></div>';
+  document.getElementById('scrim').hidden=false;
+  document.getElementById('mOk').onchange=e=>{document.getElementById('mSend').disabled=!e.target.checked;};
+  document.getElementById('mCancel').onclick=closeModal;
+  document.getElementById('mSend').onclick=doSend;
+}
+function closeModal(){document.getElementById('scrim').hidden=true;}
+async function doSend(){
+  const m=document.getElementById('modal');MS.busy=true;
+  m.innerHTML='<h3>Sending…</h3><p class="mnote">Each message is paced about a second apart. Keep this tab open. Large groups can take a minute.</p>';
+  try{
+    const j=await srv('apiMsgSend',{confirm:true,template:MS.tpl,note:noteVal(),recipients:Array.from(MS.sel)});
+    const sent=j.results.filter(r=>r.status==='Sent').length,bad=j.results.filter(r=>r.status!=='Sent');
+    m.innerHTML='<h3>'+sent+' sent'+(bad.length?', '+bad.length+' not sent':'')+'</h3>'+(bad.length?'<div style="max-height:240px;overflow:auto">'+bad.map(r=>'<div class="fail"><b>'+esc(r.name)+'</b> · '+esc(r.detail)+'</div>').join('')+'</div>':'<p class="mnote">Everyone on the list received the message.</p>')+'<div class="mbtns"><button class="btn brand" id="mDone">Done</button></div>';
+    MS.sel.clear();
+  }catch(e){m.innerHTML='<h3>Not sent</h3><div class="banner warn">'+esc(e.message)+'</div><div class="mbtns"><button class="btn" id="mDone">Close</button></div>';}
+  finally{MS.busy=false;}
+  document.getElementById('mDone').onclick=async()=>{closeModal();MS.ctx=null;MS.err=null;MS.items=[];try{MS.ctx=await srv('apiMsgContext');}catch(e){MS.err=e.message;}paintMessages();loadPreview();loadLog();};
+}
+async function loadLog(){
+  const el=document.getElementById('msgLog');
+  try{const j=await srv('apiMsgLog');
+    el.innerHTML=j.rows.length?'<table class="msgtable"><thead><tr><th>Time</th><th>Sent by</th><th>Recipient</th><th>Type</th><th>Result</th><th>Detail</th></tr></thead><tbody>'+j.rows.map(r=>'<tr><td>'+esc(String(r[0]).replace('T',' ').slice(0,16))+'</td><td>'+esc(r[1])+'</td><td>'+esc(r[2])+'</td><td>'+esc(r[3])+'</td><td><span class="bdg '+(r[4]==='Sent'?'ok':'over')+'">'+esc(r[4])+'</span></td><td>'+esc(r[5])+'</td></tr>').join('')+'</tbody></table>':'<div class="empty">No messages sent yet.</div>';
+  }catch(e){el.innerHTML='<div class="empty">'+esc(e.message)+'</div>';}
+}
+function wireMessages(){
+  document.getElementById('rlist').addEventListener('change',e=>{const cb=e.target.closest('input[type=checkbox]');if(!cb)return;if(!addSel(cb.dataset.n,cb.checked))cb.checked=false;paintMessages();schedulePreview();});
+  document.getElementById('msgFilters').addEventListener('click',e=>{const b=e.target.closest('button[data-f]');if(!b)return;MS.filter=b.dataset.f;paintMessages();});
+  let qt;document.getElementById('msgQ').addEventListener('input',e=>{clearTimeout(qt);qt=setTimeout(()=>{MS.q=e.target.value.trim().toLowerCase();paintList();},150);});
+  document.getElementById('selAttn').onclick=()=>{if(!MS.ctx)return;let skipped=0;MS.ctx.recipients.filter(needsAttn).forEach(r=>{if(MS.sel.size<MAX_SEL)MS.sel.add(r.name);else skipped++;});paintMessages();schedulePreview();if(skipped)alert('Selected the first '+MAX_SEL+'. '+skipped+' more need attention; send them in another message.');};
+  document.getElementById('selNone').onclick=()=>{MS.sel.clear();paintMessages();schedulePreview();};
+  document.getElementById('tplgrid').addEventListener('change',e=>{const r=e.target.closest('input[name=tpl]');if(!r)return;MS.tpl=r.value;paintMessages();schedulePreview();});
+  document.getElementById('msgNote').addEventListener('input',()=>{document.getElementById('noteCount').textContent=document.getElementById('msgNote').value.length;clearTimeout(MS.timer);MS.timer=setTimeout(()=>{paintMessages();loadPreview();},350);});
+  document.getElementById('pPrev').onclick=()=>{if(MS.pi>0){MS.pi--;showItem();}};
+  document.getElementById('pNext').onclick=()=>{if(MS.pi<MS.items.length-1){MS.pi++;showItem();}};
+  document.getElementById('sendBtn').onclick=openConfirm;
+  document.getElementById('scrim').addEventListener('click',e=>{if(e.target.id==='scrim')closeModal();});
+}
+// reconciliation line on each page: the page total must equal the sum of the view
+function tieSet(id,master,parts){const el=document.getElementById('tie-'+id);if(!el)return;const d=Math.abs(master-parts);el.className='tie'+(d>1?' warn':'');el.innerHTML=d<=1?'<b>✓</b> Reconciles to the view total: <b>'+$f(master)+'</b> across '+int(IDX.length)+' expense lines':'<b>⚠</b> Differs from the view total by '+$f(d)+'. Please report this.';}
+function grpSum(ix,kf){let s=0;for(const g of grp(ix,kf).values())s+=g.a;return s;}
+function ovWrap(){rOverview();tieSet('overview',sum(IDX),grpSum(IDX,i=>TX.ow[i]));}
+function lvWrap(){rLeaders();tieSet('leaders',sum(IDX),grpSum(IDX,i=>TX.ld[i]));}
+function pplWrap(){rPeople();tieSet('people',sum(IDX),grpSum(IDX,i=>TX.e[i]));}
+function catWrap(){rCats();tieSet('cats',sum(IDX),grpSum(IDX,i=>TX.x[i]));}
+// keyboard: 1-9 switch pages, / search, Esc closes panels
+document.addEventListener('keydown',e=>{const tag=(e.target&&e.target.tagName)||'';if(/INPUT|TEXTAREA|SELECT/.test(tag)){if(e.key==='Escape'){document.activeElement.blur();}return;}
+  if(e.key==='Escape'){closeModal();document.getElementById('drawer').classList.remove('open');return;}
+  if(e.key==='/'){e.preventDefault();document.getElementById('more').classList.add('open');document.getElementById('f_q').focus();return;}
+  const tabs=Array.from(document.querySelectorAll('#tabs button'));const n=parseInt(e.key,10);if(n>=1&&n<=9&&tabs[n-1]){go(tabs[n-1].dataset.p);}});
+// subtle 3D: KPI cards tilt toward the pointer (fine pointers only, and never with reduced motion)
+(function(){if(window.matchMedia('(prefers-reduced-motion: reduce)').matches||!window.matchMedia('(pointer: fine)').matches)return;
+  document.addEventListener('pointermove',e=>{const k=e.target.closest&&e.target.closest('.kpi');if(!k)return;const r=k.getBoundingClientRect();const x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;
+    k.style.setProperty('--ry',((x-.5)*9).toFixed(2)+'deg');k.style.setProperty('--rx',((.5-y)*7).toFixed(2)+'deg');k.style.setProperty('--mx',(x*100).toFixed(1)+'%');k.style.setProperty('--my',(y*100).toFixed(1)+'%');});
+  document.addEventListener('pointerout',e=>{const k=e.target.closest&&e.target.closest('.kpi');if(!k)return;if(e.relatedTarget&&k.contains(e.relatedTarget))return;k.style.setProperty('--rx','0deg');k.style.setProperty('--ry','0deg');});
+})();
+
+const R={messages:rMessages,overview:ovWrap,insights:rInsights,leaders:lvWrap,people:pplWrap,cats:catWrap,travel:rTravel,ta:rTa,controls:rControls,policy:rPolicy};
+document.getElementById('csvBtn').onclick=()=>{const hdr=['Date','Week','Region','Leader','Leader+1','Leader+2','Budget owner','Employee','Expense type','Category','Purpose','Status','Vendor','City','Amount USD','Customer-facing','Inside an approved trip','Policy flags'];const q=v=>{v=String(v??'');return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;};const out=[hdr.join(',')];
+  for(const i of IDX){const d=dDate(TX.d[i]);out.push([d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'),WK[i],DI.ou[TX.ou[i]],DI.ld[TX.ld[i]],DI.l1[TX.l1[i]],DI.l2[TX.l2[i]],DI.ow[TX.ow[i]],DI.e[TX.e[i]],DI.x[TX.x[i]],CATS[CI[i]],DI.p[TX.p[i]],DI.s[TX.s[i]],DI.v[TX.v[i]],DI.c[TX.c[i]],TX.a[i],TX.cu[i]?'Yes':'No',TX.lk[i]?'Yes':'No',M.flags.filter((f,b)=>TX.f[i]&(1<<b)).map(f=>FLBL[f]).join('; ')].map(q).join(','));}
+  const blob=new Blob(['\ufeff'+out.join('\n')],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='te_q3_lines.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);};
+document.getElementById('freshness').innerHTML='Data through <b>'+dL(LAST)+', '+dDate(LAST).getFullYear()+'</b> · rebuilt '+(M.generated?new Date(M.generated).toLocaleString([],{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'')+(M.refreshError?' · <span style="color:#BA0517;font-weight:700" title="'+esc(M.refreshError)+'">auto-refresh failed, showing last good data</span>':'')+'<br>'+(M.user?esc(M.user)+' · ':'')+(M.scopeKind==='all'?'All leaders':'Showing <b>'+esc(M.scope)+'</b>')+' · build '+esc(M.codeVersion||'?');
+  {const e2=dDate(QD-1);document.getElementById('crumb').textContent=(M.quarterLabel||'')+' · '+dL(0)+' to '+dL(QD-1)+', '+e2.getFullYear()+(M.scopeKind==='all'?'':' · '+M.scope);}
+
+document.getElementById('subtitle').textContent=PG.overview[1];
+fillAll();refresh();
+wireMessages();
+window.__TE={F,refresh,fillAll,go,forecast:()=>forecast(IDX,TIX),IDX:()=>IDX,TIX:()=>TIX,insights:()=>insights(),ask:q=>answer(q)};
+}
+
+(function(){
+  const PAGE_VERSION='2026.10.27-f';
+  const lock=document.getElementById('lock'),form=document.getElementById('lockForm');
+  const show=(title,msg)=>{lock.hidden=false;form.innerHTML='<div class="logo" style="width:42px;height:42px">T&amp;E</div><h1>'+title+'</h1><p>'+msg+'</p>';};
+  const b64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+  async function gunzip(bytes){if(!('DecompressionStream' in window))throw new Error('Please open this in a current version of Chrome, Edge, Safari or Firefox.');const s=new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));return await new Response(s).text();}
+  show('Loading your dashboard','Checking your access and preparing your team\'s numbers. This takes a few seconds.');
+  document.getElementById('main').style.visibility='hidden';
+  google.script.run.withSuccessHandler(async s=>{
+    try{const r=JSON.parse(s);if(r.error){show('You do not have access',esc(r.error));return;}
+      const P=JSON.parse(await gunzip(b64(r.gz)));boot(P);lock.hidden=true;document.getElementById('main').style.visibility='';
+      if(P.meta.codeVersion!==PAGE_VERSION){const d=document.createElement('div');d.setAttribute('role','alert');d.style.cssText='background:#FEF1E1;border:1px solid #DD7A01;color:#5C3300;padding:10px 14px;border-radius:4px;margin-bottom:14px;font-size:13px';
+        d.innerHTML='<b>Page and script are different versions.</b> This page is build '+PAGE_VERSION+' but the script is build '+esc(P.meta.codeVersion||'older')+'. In Apps Script make sure both Code.gs and Index.html are the latest files, then Deploy &gt; Manage deployments &gt; Edit &gt; New version.';document.getElementById('main').prepend(d);}
+      if(P.meta.syncWarning){const w=document.createElement('div');w.setAttribute('role','alert');w.style.cssText='background:#FEF1E1;border:1px solid #DD7A01;color:#5C3300;padding:10px 14px;border-radius:8px;margin-bottom:14px;font-size:13px';w.innerHTML='<b>Leader columns are not synced from Workday.</b> '+esc(P.meta.syncWarning)+' Budget figures may be charged to the wrong leader until this is fixed. Only admins see this message.';document.getElementById('main').prepend(w);}
+    }catch(e){console.error(e);show('The dashboard could not open',esc(e.message));}
+  }).withFailureHandler(e=>show('The dashboard could not open',esc(e&&e.message?e.message:String(e)))).getPayload();
+})();
+</script>
+</body>
+</html>
