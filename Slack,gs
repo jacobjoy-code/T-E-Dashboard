@@ -1,0 +1,143 @@
+/**
+ * SlackSetup.gs
+ *
+ * One-off helpers to confirm the Slack connection for the T&E dashboard.
+ * Add this as a NEW file in the Apps Script project (+ > Script). It does not
+ * change Code.gs or Index.html, and every function name is prefixed
+ * "slackSetup_" so it cannot clash with existing code.
+ *
+ * The token is NEVER stored in this file. It lives only in
+ * Project Settings > Script properties.
+ *
+ * How to use:
+ *   1. Run slackSetup_checkToken()  -> confirms the token works and lists any missing scopes.
+ *   2. Run slackSetup_sendTestToMe() -> sends a test DM to the account running the script.
+ *   3. Open View > Execution log to read the results.
+ */
+
+// Must match the Script property key that Code.gs reads for the Slack token.
+// Search Code.gs for getProperty( near the Slack status check to confirm the name.
+var SLACKSETUP_TOKEN_KEY = 'SLACK_BOT_TOKEN';
+
+// Scopes the dashboard's messaging needs (lookup by email, open DM, post).
+var SLACKSETUP_REQUIRED_SCOPES = ['chat:write', 'im:write', 'users:read', 'users:read.email'];
+
+var SLACKSETUP_HINTS = {
+  not_authed: 'No token was sent. Check the Script property key name.',
+  invalid_auth: 'Slack rejected the token. Re-copy the Bot User OAuth Token (starts with xoxb-).',
+  token_revoked: 'The token was revoked. Reinstall the app and store the new token.',
+  account_inactive: 'The app or its installer is deactivated in the workspace.',
+  missing_scope: 'Add the missing bot scope under OAuth & Permissions, then Reinstall to Workspace.',
+  users_not_found: 'Slack has no user with that email. Check the email on the Slack profile.',
+  channel_not_found: 'Slack could not open a DM with that user.'
+};
+
+function slackSetup_getToken_() {
+  var token = PropertiesService.getScriptProperties().getProperty(SLACKSETUP_TOKEN_KEY);
+  if (!token) {
+    throw new Error('No Script property named "' + SLACKSETUP_TOKEN_KEY +
+      '". Add it in Project Settings > Script properties (key must match Code.gs).');
+  }
+  token = String(token).trim();
+  if (token.indexOf('xoxb-') !== 0) {
+    throw new Error('The stored value does not start with "xoxb-". Use the Bot User OAuth Token, ' +
+      'not a user token, signing secret or client secret.');
+  }
+  return token;
+}
+
+function slackSetup_call_(method, payload) {
+  var res = UrlFetchApp.fetch('https://slack.com/api/' + method, {
+    method: 'post',
+    contentType: 'application/x-www-form-urlencoded',
+    headers: { Authorization: 'Bearer ' + slackSetup_getToken_() },
+    payload: payload || {},
+    muteHttpExceptions: true
+  });
+  var body;
+  try {
+    body = JSON.parse(res.getContentText());
+  } catch (e) {
+    throw new Error('Slack returned a non-JSON response (HTTP ' + res.getResponseCode() + ').');
+  }
+  return { body: body, headers: res.getHeaders() };
+}
+
+function slackSetup_header_(headers, name) {
+  var wanted = name.toLowerCase();
+  for (var k in headers) {
+    if (String(k).toLowerCase() === wanted) return headers[k];
+  }
+  return '';
+}
+
+function slackSetup_explain_(body) {
+  var err = body && body.error ? body.error : 'unknown_error';
+  var hint = SLACKSETUP_HINTS[err] ? ' - ' + SLACKSETUP_HINTS[err] : '';
+  var extra = body && body.needed ? ' (needed: ' + body.needed + ')' : '';
+  return err + extra + hint;
+}
+
+/** Step 1: confirms the token is valid and that the bot has the scopes the dashboard needs. */
+function slackSetup_checkToken() {
+  var r = slackSetup_call_('auth.test');
+  if (!r.body.ok) {
+    var failMsg = 'FAILED: ' + slackSetup_explain_(r.body);
+    Logger.log(failMsg);
+    return failMsg;
+  }
+
+  var granted = String(slackSetup_header_(r.headers, 'x-oauth-scopes'))
+    .split(',')
+    .map(function (s) { return s.trim(); })
+    .filter(String);
+  var missing = SLACKSETUP_REQUIRED_SCOPES.filter(function (s) { return granted.indexOf(s) === -1; });
+
+  var lines = [
+    'Token OK.',
+    'Workspace: ' + r.body.team,
+    'Bot user: ' + r.body.user,
+    'Scopes granted: ' + (granted.length ? granted.join(', ') : '(not reported)'),
+    missing.length
+      ? 'MISSING scopes: ' + missing.join(', ') + '. Add them, then Reinstall to Workspace.'
+      : 'All required scopes present.'
+  ];
+  Logger.log(lines.join('\n'));
+  return lines.join('\n');
+}
+
+/** Step 2: sends a test DM to whoever runs the script. No emails are hardcoded. */
+function slackSetup_sendTestToMe() {
+  var email = Session.getActiveUser().getEmail() || Session.getEffectiveUser().getEmail();
+  if (!email) {
+    throw new Error('Could not read your Google account email. Run this from the editor while signed in.');
+  }
+
+  var lookup = slackSetup_call_('users.lookupByEmail', { email: email });
+  if (!lookup.body.ok) {
+    var m1 = 'Lookup FAILED: ' + slackSetup_explain_(lookup.body);
+    Logger.log(m1);
+    return m1;
+  }
+
+  var opened = slackSetup_call_('conversations.open', { users: lookup.body.user.id });
+  if (!opened.body.ok) {
+    var m2 = 'Open DM FAILED: ' + slackSetup_explain_(opened.body);
+    Logger.log(m2);
+    return m2;
+  }
+
+  var posted = slackSetup_call_('chat.postMessage', {
+    channel: opened.body.channel.id,
+    text: 'Test message from the T&E dashboard. If you can read this, Slack sending is connected.'
+  });
+  if (!posted.body.ok) {
+    var m3 = 'Post FAILED: ' + slackSetup_explain_(posted.body);
+    Logger.log(m3);
+    return m3;
+  }
+
+  var ok = 'Test DM sent. Check Slack.';
+  Logger.log(ok);
+  return ok;
+}
